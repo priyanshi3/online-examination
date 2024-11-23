@@ -28,4 +28,13 @@ public class StudentService {
 		return studentRepository.existsByEmailId(emailId);
 	}
 
+	public Student updateStudent(Long studentId, Student student) {
+		Optional<Student> std = studentRepository.findById(studentId);
+		
+		if (std.isEmpty()) {
+			throw new ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND, "Student not found");
+		}
+		return studentRepository.save(student);
+	}
+	
 }

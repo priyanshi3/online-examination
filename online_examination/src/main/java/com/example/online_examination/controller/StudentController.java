@@ -33,7 +33,11 @@ public class StudentController {
 	}
 	
 	// update student details
-	
+	@PostMapping("/update/{id}")
+	public Boolean updateStudent(@PathVariable Long studentId, @RequestBody Student student) {
+		studentService.updateStudent(studentId, student);
+		return true;
+	}
 	
 	//check for valid student for login
 	@PostMapping("/login")
