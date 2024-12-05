@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { AppBar, Toolbar, Typography, List, ListItem, ListItemText, Container, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ManageStudents from './ManageStudents';
+import ManageQuestions from './ManageQuestions';
 
 const HomePageAdmin = () => {
   const { authenticated, emailId } = useAuth();
@@ -18,7 +19,9 @@ const HomePageAdmin = () => {
   const renderContent = () => {
     switch (selectedItem) {
       case 'students':
-        return <ManageStudents/>;
+        return <ManageStudents />;
+      case 'questions':
+        return <ManageQuestions />;
       case 'exams':
         return <Typography align="center" sx={{ fontSize: '24px' }}>Exams Content</Typography>;
       default:
@@ -49,6 +52,9 @@ const HomePageAdmin = () => {
           </ListItem>
           <ListItem button onClick={() => handleMenuItemClick('/students', 'students')}>
             <ListItemText primary="Students" sx={{ color: 'black' }} />
+          </ListItem>
+          <ListItem button onClick={() => handleMenuItemClick('/questions', 'questions')}>
+            <ListItemText primary="Questions" sx={{ color: 'black' }} />
           </ListItem>
           <ListItem button onClick={() => handleMenuItemClick('/exams', 'exams')}>
             <ListItemText primary="Exams" sx={{ color: 'black' }} />

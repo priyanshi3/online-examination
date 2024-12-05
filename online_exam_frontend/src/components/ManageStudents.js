@@ -33,18 +33,17 @@ const ManageStudents = () => {
   const [editingIndex, setEditingIndex] = useState(null);
 
   // Fetch students from database
-  useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        const response = await axios.get('http://localhost:8080/student/fetchAll');
-        //console.log(response.data);
-        setStudents(response.data);
-      } catch (error) {
-        setSnackbarMessage('Error fetching students: ' + error.message);
-        setSnackbarOpen(true);
-      }
-    };
+  const fetchStudents = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/student/fetchAll');
+      setStudents(response.data);
+    } catch (error) {
+      setSnackbarMessage('Error fetching students: ' + error.message);
+      setSnackbarOpen(true);
+    }
+  };
 
+  useEffect(() => {
     fetchStudents();
   }, []);
 
@@ -63,6 +62,7 @@ const ManageStudents = () => {
     try {
       const response = await axios.post('http://localhost:8080/student/addDetails', newStudent);
       setStudents([...students, response.data]);
+      fetchStudents();
       resetForm();
     } catch (error) {
       setSnackbarMessage('Error adding student: ' + error.message);
@@ -79,11 +79,16 @@ const ManageStudents = () => {
     }
 
     try {
-      const studentToUpdate = students[editingIndex];
-      await axios.put(`http://localhost:8080/student/${studentToUpdate.id}`, newStudent);
-      const updatedStudents = [...students];
-      updatedStudents[editingIndex] = { ...studentToUpdate, ...newStudent };
-      setStudents(updatedStudents);
+      const studentIdToUpdate = editingIndex;
+      const response = await axios.put(`http://localhost:8080/student/update/${studentIdToUpdate}`, newStudent);
+      // const updatedStudents = [...students];
+      // updatedStudents[editingIndex] = { ...studentToUpdate, ...newStudent };
+      // setStudents(updatedStudents);
+      setNewStudent(response.data);
+      setIsEditing(false);
+      setEditingIndex(null);
+      // Fetch updated student list to reflect changes
+      fetchStudents();
       resetForm();
     } catch (error) {
       setSnackbarMessage('Error updating student: ' + error.message);
@@ -94,9 +99,10 @@ const ManageStudents = () => {
   const handleEditStudent = (index) => {
     // change buttons
     const studentToEdit = students[index];
+    setEditingIndex(studentToEdit.studentId);
     setNewStudent(studentToEdit);
     setIsEditing(true);
-    setEditingIndex(index);
+    
   };
 
   const resetForm = () => {
@@ -213,17 +219,17 @@ const ManageStudents = () => {
       {/* Table to view all students */}
       <Grid container spacing={2} sx={{ marginTop: 4 }}>
         <Grid item xs={12}>
-          <Typography variant="h6">All Students</Typography>
+          <Typography variant="h6" style={{ fontWeight: 'bold' }}>All Students</Typography>
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>First Name</TableCell>
-                  <TableCell>Last Name</TableCell>
-                  <TableCell sx={{width : '250px'}}>Email</TableCell>
-                  <TableCell>Phone Number</TableCell>
-                  <TableCell>CPI</TableCell>
-                  <TableCell>Actions</TableCell>
+                  <TableCell style={{ fontWeight: 'bold' }}>First Name</TableCell>
+                  <TableCell style={{ fontWeight: 'bold' }}>Last Name</TableCell>
+                  <TableCell style={{ fontWeight: 'bold' }} sx={{width : '250px'}}>Email</TableCell>
+                  <TableCell style={{ fontWeight: 'bold' }}>Phone Number</TableCell>
+                  <TableCell style={{ fontWeight: 'bold' }}>CPI</TableCell>
+                  <TableCell style={{ fontWeight: 'bold' }}>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
