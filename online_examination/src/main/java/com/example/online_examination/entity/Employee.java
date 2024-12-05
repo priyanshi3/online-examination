@@ -10,13 +10,13 @@ import jakarta.persistence.Id;
 public class Employee {
 
 	@Id
-	@Column(name="user_ID")
+	@Column(name = "user_ID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long userId;
-	
-	@Column(name="email_ID")
+
+	@Column(name = "email_ID", nullable = false)
 	private String emailId;
-	
+
 	public Employee() {
 		// TODO Auto-generated constructor stub
 		super();
@@ -43,7 +43,5 @@ public class Employee {
 	public void setEmailId(String emailId) {
 		this.emailId = emailId;
 	}
-	
-	
 
 }

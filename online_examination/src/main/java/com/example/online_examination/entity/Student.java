@@ -1,31 +1,36 @@
 package com.example.online_examination.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
-@Table(name="student")
+@Table(name = "student")
 public class Student {
-	
+
 	@Id
-	@Column(name="student_ID")
+	@Column(name = "student_ID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long studentId ;	//  primary key
-	
-	@Column(name="first_name")
+	private Long studentId; // primary key
+
+	@Column(name = "first_name", nullable = false)
 	private String firstName;
-	
-	@Column(name="last_name")
+
+	@Column(name = "last_name", nullable = false)
 	private String lastName;
-	
-	@Column(name="email_ID")
+
+	@Column(name = "email_ID", nullable = false)
 	private String emailId;
-	
-	@Column(name="phone_number")
+
+	@Column(name = "phone_number", nullable = false)
 	private Long phoneNumber;
-	
-	@Column(name="CPI")
+
+	@Column(name = "CPI", nullable = false)
 	private Double cpi;
-	
+
 	public Student() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -89,5 +94,4 @@ public class Student {
 		this.cpi = cpi;
 	}
 
-	
 }
