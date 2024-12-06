@@ -9,46 +9,39 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class Options {
+public class Answer {
 
 	@Id
-	@Column(name = "option_ID")
+	@Column(name = "answer_ID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long optionId;
-
-	@Column(name = "option_text", nullable = false)
-	private String optionText;
+	private Long answerId;
 
 	@ManyToOne
 	@JoinColumn(name = "question_ID", nullable = false)
 	private Question questionId;
 
-	public Options() {
+	@ManyToOne
+	@JoinColumn(name = "option_ID", nullable = false)
+	private Options optionId;
+
+	public Answer() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public Options(Long optionId, String optionText, Question questionId) {
+	public Answer(Long answerId, Question questionId, Options optionId) {
 		super();
-		this.optionId = optionId;
-		this.optionText = optionText;
+		this.answerId = answerId;
 		this.questionId = questionId;
-	}
-
-	public Long getOptionId() {
-		return optionId;
-	}
-
-	public void setOptionId(Long optionId) {
 		this.optionId = optionId;
 	}
 
-	public String getOptionText() {
-		return optionText;
+	public Long getAnswerId() {
+		return answerId;
 	}
 
-	public void setOptionText(String optionText) {
-		this.optionText = optionText;
+	public void setAnswerId(Long answerId) {
+		this.answerId = answerId;
 	}
 
 	public Question getQuestionId() {
@@ -59,4 +52,11 @@ public class Options {
 		this.questionId = questionId;
 	}
 
+	public Options getOptionId() {
+		return optionId;
+	}
+
+	public void setOptionId(Options optionId) {
+		this.optionId = optionId;
+	}
 }

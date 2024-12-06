@@ -3,7 +3,11 @@ package com.example.online_examination.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.online_examination.entity.Answer;
+import com.example.online_examination.entity.Options;
 import com.example.online_examination.entity.Question;
+import com.example.online_examination.repository.AnswerRepository;
+import com.example.online_examination.repository.OptionsRepository;
 import com.example.online_examination.repository.QuestionRepository;
 
 @Service
@@ -12,7 +16,21 @@ public class QuestionService {
 	@Autowired
 	private QuestionRepository questionRepository;
 
-	public Question saveQuestion(Question question) {
+	@Autowired
+	private OptionsRepository optionsRepository;
+
+	@Autowired
+	private AnswerRepository answerRepository;
+
+	public Question addQuestionWithOptions(Question question) {
 		return questionRepository.save(question);
+	}
+
+	public Options addOption(Options options) {
+		return optionsRepository.save(options);
+	}
+
+	public Answer addAnswer(Answer answer) {
+		return answerRepository.save(answer);
 	}
 }

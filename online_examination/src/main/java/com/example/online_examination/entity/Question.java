@@ -1,7 +1,5 @@
 package com.example.online_examination.entity;
 
-import java.util.List;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,7 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 
 @Entity
 public class Question {
@@ -30,19 +27,15 @@ public class Question {
 	@JoinColumn(name = "difficulty_level_ID")
 	private Difficulty difficultyLevelId;
 
-	@OneToMany(mappedBy = "questionId")
-	private List<Options> options;
+//	@OneToMany(mappedBy = "questionId")
+//	private List<Options> options;
+//
+//	@OneToOne(mappedBy = "questionId")
+//	private Answer answer;
 
 	public Question() {
 		super();
 		// TODO Auto-generated constructor stub
-	}
-
-	public Question(Long questionId, String question, Category categoryId) {
-		super();
-		this.questionId = questionId;
-		this.question = question;
-		this.categoryId = categoryId;
 	}
 
 	public Question(Long questionId, String question, Category categoryId, Difficulty difficultyLevelId) {
@@ -53,15 +46,12 @@ public class Question {
 		this.difficultyLevelId = difficultyLevelId;
 	}
 
-	public Question(Long questionId, String question, Category categoryId, Difficulty difficultyLevelId,
-			List<Options> options) {
-		super();
-		this.questionId = questionId;
-		this.question = question;
-		this.categoryId = categoryId;
-		this.difficultyLevelId = difficultyLevelId;
-		this.options = options;
-	}
+//	public Question(Long questionId, String question, Category categoryId) {
+//		super();
+//		this.questionId = questionId;
+//		this.question = question;
+//		this.categoryId = categoryId;
+//	}
 
 	public Long getQuestionId() {
 		return questionId;
@@ -95,11 +85,20 @@ public class Question {
 		this.difficultyLevelId = difficultyLevelId;
 	}
 
-	public List<Options> getOptions() {
-		return options;
-	}
+//	public List<Options> getOptions() {
+//		return options;
+//	}
+//
+//	public void setOptions(List<Options> options) {
+//		this.options = options;
+//	}
+//
+//	public Answer getAnswer() {
+//		return answer;
+//	}
+//
+//	public void setAnswer(Answer answer) {
+//		this.answer = answer;
+//	}
 
-	public void setOptions(List<Options> options) {
-		this.options = options;
-	}
 }

@@ -81,9 +81,6 @@ const ManageStudents = () => {
     try {
       const studentIdToUpdate = editingIndex;
       const response = await axios.put(`http://localhost:8080/student/update/${studentIdToUpdate}`, newStudent);
-      // const updatedStudents = [...students];
-      // updatedStudents[editingIndex] = { ...studentToUpdate, ...newStudent };
-      // setStudents(updatedStudents);
       setNewStudent(response.data);
       setIsEditing(false);
       setEditingIndex(null);
@@ -102,7 +99,7 @@ const ManageStudents = () => {
     setEditingIndex(studentToEdit.studentId);
     setNewStudent(studentToEdit);
     setIsEditing(true);
-    
+
   };
 
   const resetForm = () => {
@@ -226,7 +223,7 @@ const ManageStudents = () => {
                 <TableRow>
                   <TableCell style={{ fontWeight: 'bold' }}>First Name</TableCell>
                   <TableCell style={{ fontWeight: 'bold' }}>Last Name</TableCell>
-                  <TableCell style={{ fontWeight: 'bold' }} sx={{width : '250px'}}>Email</TableCell>
+                  <TableCell style={{ fontWeight: 'bold' }} sx={{ width: '250px' }}>Email</TableCell>
                   <TableCell style={{ fontWeight: 'bold' }}>Phone Number</TableCell>
                   <TableCell style={{ fontWeight: 'bold' }}>CPI</TableCell>
                   <TableCell style={{ fontWeight: 'bold' }}>Actions</TableCell>
@@ -237,7 +234,7 @@ const ManageStudents = () => {
                   <TableRow key={student.id}>
                     <TableCell>{student.firstName}</TableCell>
                     <TableCell>{student.lastName}</TableCell>
-                    <TableCell sx={{width : '250px'}}>{student.emailId}</TableCell>
+                    <TableCell sx={{ width: '250px' }}>{student.emailId}</TableCell>
                     <TableCell>{student.phoneNumber}</TableCell>
                     <TableCell>{student.cpi}</TableCell>
                     <TableCell>

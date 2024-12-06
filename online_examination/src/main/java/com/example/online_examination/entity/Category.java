@@ -14,7 +14,7 @@ public class Category {
 	@Id
 	@Column(name = "category_ID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Short categoryId; // primary key
+	private Integer categoryId; // primary key
 
 	@Column(name = "category_name", nullable = false)
 	private String categoryName;
@@ -24,17 +24,22 @@ public class Category {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Category(Short categoryId, String categoryName) {
+	public Category(Integer categoryId) {
+		super();
+		this.categoryId = categoryId;
+	}
+
+	public Category(Integer categoryId, String categoryName) {
 		super();
 		this.categoryId = categoryId;
 		this.categoryName = categoryName;
 	}
 
-	public Short getCategoryId() {
+	public Integer getCategoryId() {
 		return categoryId;
 	}
 
-	public void setCategoryId(Short categoryId) {
+	public void setCategoryId(Integer categoryId) {
 		this.categoryId = categoryId;
 	}
 

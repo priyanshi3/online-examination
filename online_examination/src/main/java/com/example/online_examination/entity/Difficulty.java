@@ -12,7 +12,7 @@ public class Difficulty {
 	@Id
 	@Column(name = "difficulty_level_ID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Short difficultyLevelId; // primary key
+	private Integer difficultyLevelId; // primary key
 
 	@Column(name = "difficulty_level", nullable = false)
 	private String difficultyLevel;
@@ -22,17 +22,17 @@ public class Difficulty {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Difficulty(Short difficultyLevelId, String difficultyLevel) {
+	public Difficulty(Integer difficultyLevelId, String difficultyLevel) {
 		super();
 		this.difficultyLevelId = difficultyLevelId;
 		this.difficultyLevel = difficultyLevel;
 	}
 
-	public Short getDifficultyLevelId() {
+	public Integer getDifficultyLevelId() {
 		return difficultyLevelId;
 	}
 
-	public void setDifficultyLevelId(Short difficultyLevelId) {
+	public void setDifficultyLevelId(Integer difficultyLevelId) {
 		this.difficultyLevelId = difficultyLevelId;
 	}
 
