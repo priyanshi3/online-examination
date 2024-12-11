@@ -25,7 +25,7 @@ const ManageQuestions = () => {
     difficulty: 0,
     numberOfOptions: 2,
     options: ['', '', '', ''],
-    answerOption: '',
+    answerOption: ' ',
     programmingDetails: '',
   });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -86,203 +86,226 @@ const ManageQuestions = () => {
   };
 
   const handleAnswerChange = (event) => {
-    const selectedOption = event.target.value;
-    setNewQuestion({ ...newQuestion, answerOption: selectedOption });
+    setNewQuestion({ ...newQuestion, answerOption: event.target.value });
   };
 
   const handleSubmit = async () => {
-    const { questionText, category, difficulty, numberOfOptions, options, answerOption, programmingDetails } = newQuestion;
+    const { questionText, category, difficulty, options, answerOption, programmingDetails } = newQuestion;
 
-    var questionData;
-    if (difficulty == 0) {
-      questionData = {
-        question: questionText,
-        categoryId: parseInt(category, 10),
-      };
-    }
-    else {
-      questionData = {
-        question: questionText,
-        categoryId: parseInt(category, 10),
-        difficultyId: difficulty,
-      };
+
+
+    let questionData = {
+      question: questionText,
+      categoryId: parseInt(category, 10),
+    };
+
+    if (difficulty !== 0) {
+      questionData.difficultyId = difficulty;
     }
 
-    var response;
     try {
-      response = await axios.post('http://localhost:8080/question/addQuestion', questionData);
+      const response = await axios.post('http://localhost:8080/question/addQuestion', questionData);
       console.log('Question submitted successfully:', response.data);
+
+      // add options value to database
+      const newQuestionId = parseInt(response.data.questionId, 10);
+      if (difficulty === 0) {
+        for (const option of options) {
+          if (option !== '') {
+            const optionData = {
+              optionText: option,
+              questionId: newQuestionId
+            };
+            // console.log(optionData);
+            try {
+              await axios.post('http://localhost:8080/options/addOption', optionData);
+
+              // add answer value to database
+              const answerData = {
+                questionId: newQuestionId,
+                optionId: answerOption
+              }
+              // console.log(answerData)
+              try {
+                await axios.post('http://localhost:8080/answer/addAnswer', answerData);
+              } catch (error) {
+                console.error('Error submitting answer:', error);
+                setSnackbarMessage('Error submitting answer. Please try again.');
+              }
+            } catch (error) {
+              console.error('Error submitting option:', error);
+              setSnackbarMessage('Error submitting option. Please try again.');
+            }
+          }
+        }
+      }
+      else {
+        const programData = {
+          programSolution: programmingDetails,
+          questionId: newQuestionId
+        }
+        console.log(programData);
+        try {
+          await axios.post('http://localhost:8080/program/addProgram', programData);
+        } catch (error) {
+          console.error('Error submitting program solution:', error);
+          setSnackbarMessage('Error submitting program solution. Please try again.');
+        }
+      }
       // Reset the form after successful submission
-      // setNewQuestion({
-      //   questionText: '',
-      //   category: '',
-      //   difficulty: '',
-      //   numberOfOptions: 2,
-      //   options: ['', '', '', ''],
-      //   answerOption: '',
-      //   programmingDetails: '',
-      // });
-      setSnackbarMessage('Question submitted successfully!');
+      setNewQuestion({
+        questionText: '',
+        category: '',
+        difficulty: '',
+        numberOfOptions: 2,
+        options: ['', '', '', ''],
+        answerOption: '',
+        programmingDetails: '',
+      });
     } catch (error) {
       console.error('Error submitting question:', error);
       setSnackbarMessage('Error submitting question. Please try again.');
-    } finally {
-      setSnackbarOpen(true);
     }
 
-    if (difficulty == 0) {
-      options.forEach((option, index) => {
-        const dataToSend = {
-          questionId: response.data.questionId,
-          option: option.option,
-        };
-        try {
-          response = axios.post('http://localhost:8080/options/addOption', dataToSend);
-          console.log('Option submitted successfully:', response.data);
-        } catch (error) {
-          console.error('Error submitting question:', error);
-          setSnackbarMessage('Error submitting question. Please try again.');
-        }
-      })
-    };
-
-    const handleSnackbarClose = () => {
-      setSnackbarOpen(false);
-    };
-
-    return (
-      <Box sx={{ padding: 3, marginLeft: 6 }}>
-        <Typography variant="h4" gutterBottom>
-          Manage Questions
-        </Typography>
-
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <Typography variant="h6">Add New Question</Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Question Text"
-              name="questionText"
-              value={newQuestion.questionText}
-              onChange={handleInputChange}
-              variant="outlined"
-              required
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <FormControl fullWidth variant="outlined" required>
-              <InputLabel>Category</InputLabel>
-              <Select
-                name="category"
-                value={newQuestion.category}
-                onChange={handleInputChange}
-                label="Category"
-              >
-                {categories.map((category) => (
-                  <MenuItem key={category.categoryId} value={category.categoryId}>
-                    {category.categoryName}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          {newQuestion.category === 3 ? (
-            <>
-              <Grid item xs={12} sm={6}>
-                <FormControl fullWidth variant="outlined">
-                  <InputLabel>Difficulty</InputLabel>
-                  <Select
-                    name="difficulty"
-                    value={newQuestion.difficulty}
-                    onChange={handleInputChange}
-                    label="Difficulty"
-                    required
-                  >
-                    {difficulties.map((difficulty) => (
-                      <MenuItem key={difficulty.difficultyLevelId} value={difficulty.difficultyLevelId}>
-                        {difficulty.difficultyLevel}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Programming Details"
-                  name="programmingDetails"
-                  value={newQuestion.programmingDetails}
-                  onChange={handleInputChange}
-                  variant="outlined"
-                  multiline
-                  rows={4}
-                  required
-                />
-              </Grid>
-            </>
-          ) : (
-            <>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Number of Options"
-                  type="number"
-                  value={newQuestion.numberOfOptions}
-                  onChange={(e) => handleNumberOfOptionsChange(e.target.value)}
-                  variant="outlined"
-
-                  slotProps={{
-                    inputLabel: {
-                      sx: { min: 2, max: 4 },
-                    },
-                  }}
-                  required
-                />
-              </Grid>
-              {newQuestion.options.slice(0, newQuestion.numberOfOptions).map((option, index) => (
-                <Grid item xs={12} sm={6} key={index}>
-                  <TextField
-                    fullWidth
-                    label={`Option ${index + 1}`}
-                    value={option}
-                    onChange={(e) => handleOptionChange(index, e.target.value)}
-                    variant="outlined"
-                    required
-                  />
-                  <FormControlLabel
-                    control={
-                      <Radio
-                        checked={newQuestion.answerOption === option}
-                        onChange={handleAnswerChange}
-                        value={option}
-                      />
-                    }
-                    label="Select as Answer"
-                  />
-                </Grid>
-              ))}
-            </>
-          )}
-          <Grid item xs={12}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleSubmit}
-            >
-              Submit Question
-            </Button>
-            <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
-              <Alert onClose={handleSnackbarClose} severity="warning" sx={{ width: '100%' }}>
-                {snackbarMessage}
-              </Alert>
-            </Snackbar>
-          </Grid>
-        </Grid>
-      </Box>
-    );
+  }
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
   };
-}
+
+  return (
+    <Box sx={{ padding: 3, marginLeft: 6 }}>
+      <Typography variant="h4" gutterBottom>
+        Manage Questions
+      </Typography>
+
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <Typography variant="h6">Add New Question</Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            fullWidth
+            label="Question Text"
+            name="questionText"
+            value={newQuestion.questionText}
+            onChange={handleInputChange}
+            variant="outlined"
+            required
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <FormControl fullWidth variant="outlined" required>
+            <InputLabel>Category</InputLabel>
+            <Select
+              name="category"
+              value={newQuestion.category}
+              onChange={handleInputChange}
+              label="Category"
+            >
+              {categories.map((category) => (
+                <MenuItem key={category.categoryId} value={category.categoryId}>
+                  {category.categoryName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+        {newQuestion.category === 3 ? (
+          <>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel>Difficulty</InputLabel>
+                <Select
+                  name="difficulty"
+                  value={newQuestion.difficulty}
+                  onChange={handleInputChange}
+                  label="Difficulty"
+                  required
+                >
+                  {difficulties.map((difficulty) => (
+                    <MenuItem key={difficulty.difficultyLevelId} value={difficulty.difficultyLevelId}>
+                      {difficulty.difficultyLevel}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Programming Details"
+                name="programmingDetails"
+                value={newQuestion.programmingDetails}
+                onChange={handleInputChange}
+                variant="outlined"
+                multiline
+                rows={4}
+                required
+              />
+            </Grid>
+          </>
+        ) : (
+          <>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Number of Options"
+                type="number"
+                value={newQuestion.numberOfOptions}
+                onChange={(e) => handleNumberOfOptionsChange(e.target.value)}
+                variant="outlined"
+
+                slotProps={{
+                  inputLabel: {
+                    sx: { min: 2, max: 4 },
+                  },
+                }}
+                required
+              />
+            </Grid>
+            {newQuestion.options.slice(0, newQuestion.numberOfOptions).map((option, index) => (
+              <Grid item xs={12} sm={6} key={index}>
+                <TextField
+                  fullWidth
+                  label={`Option ${index + 1}`}
+                  value={option}
+                  onChange={(e) => handleOptionChange(index, e.target.value)}
+                  variant="outlined"
+                  required
+                />
+                <FormControlLabel
+                  control={
+                    <Radio
+                      checked={newQuestion.answerOption === option} // Check if this option is the selected answer
+                      onChange={handleAnswerChange}
+                      value={option}
+                      disabled={option.trim() === ''} // Disable the radio button if option text is empty
+                    />
+                  }
+                  label="Select as Answer"
+                />
+              </Grid>
+            ))}
+          </>
+        )}
+        <Grid item xs={12}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+          >
+            Submit Question
+          </Button>
+          <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
+            <Alert onClose={handleSnackbarClose} severity="warning" sx={{ width: '100%' }}>
+              {snackbarMessage}
+            </Alert>
+          </Snackbar>
+        </Grid>
+      </Grid>
+    </Box>
+  );
+};
+
 export default ManageQuestions;

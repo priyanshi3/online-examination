@@ -6,33 +6,34 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.online_examination.entity.Options;
-import com.example.online_examination.entity.OptionsDTO;
+import com.example.online_examination.entity.Program;
+import com.example.online_examination.entity.ProgramDTO;
 import com.example.online_examination.entity.Question;
 import com.example.online_examination.repository.QuestionRepository;
-import com.example.online_examination.service.OptionsService;
+import com.example.online_examination.service.ProgramService;
 
 @RestController
-@RequestMapping("/options")
-public class OptionsController {
+@RequestMapping("/program")
+public class ProgramController {
 
 	@Autowired
-	private OptionsService optionsService;
+	private ProgramService programService;
 
 	@Autowired
 	private QuestionRepository questionRepository;
 
-	@PostMapping("/addOption")
-	public void addOptions(@RequestBody OptionsDTO optionsDTO) {
+	@PostMapping("/addProgram")
+	public void addProgram(@RequestBody ProgramDTO programDTO) {
 
 		// created Data Transfer Object class to convert Long to Question
-		Question question = questionRepository.findById(optionsDTO.getQuestionId())
+		Question question = questionRepository.findById(programDTO.getQuestionId())
 				.orElseThrow(() -> new RuntimeException("QuestionID not found"));
 
-		Options newOption = new Options();
-		newOption.setQuestionId(question);
-		newOption.setOptionText(optionsDTO.getOptionText());
+		Program newProgramSolution = new Program();
+		newProgramSolution.setProgramSolution(programDTO.getProgramSolution());
+		newProgramSolution.setQuestionId(question);
 
-		optionsService.addOptions(newOption);
+		programService.addProgram(newProgramSolution);
 	}
+
 }
