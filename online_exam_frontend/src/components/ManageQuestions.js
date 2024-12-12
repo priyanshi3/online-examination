@@ -30,6 +30,7 @@ const ManageQuestions = () => {
   });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
   useEffect(() => {
     // Fetch categories
@@ -92,15 +93,13 @@ const ManageQuestions = () => {
   const handleSubmit = async () => {
     const { questionText, category, difficulty, options, answerOption, programmingDetails } = newQuestion;
 
-
-
     let questionData = {
       question: questionText,
       categoryId: parseInt(category, 10),
     };
 
     if (difficulty !== 0) {
-      questionData.difficultyId = difficulty;
+      questionData.difficultyLevelId = parseInt(difficulty, 10);
     }
 
     try {
@@ -116,7 +115,6 @@ const ManageQuestions = () => {
               optionText: option,
               questionId: newQuestionId
             };
-            // console.log(optionData);
             try {
               await axios.post('http://localhost:8080/options/addOption', optionData);
 
@@ -125,16 +123,19 @@ const ManageQuestions = () => {
                 questionId: newQuestionId,
                 optionId: answerOption
               }
-              // console.log(answerData)
               try {
                 await axios.post('http://localhost:8080/answer/addAnswer', answerData);
               } catch (error) {
                 console.error('Error submitting answer:', error);
                 setSnackbarMessage('Error submitting answer. Please try again.');
+                setSnackbarSeverity('error');
+                setSnackbarOpen(true);
               }
             } catch (error) {
               console.error('Error submitting option:', error);
               setSnackbarMessage('Error submitting option. Please try again.');
+              setSnackbarSeverity('error');
+              setSnackbarOpen(true);
             }
           }
         }
@@ -144,12 +145,13 @@ const ManageQuestions = () => {
           programSolution: programmingDetails,
           questionId: newQuestionId
         }
-        console.log(programData);
         try {
           await axios.post('http://localhost:8080/program/addProgram', programData);
         } catch (error) {
           console.error('Error submitting program solution:', error);
           setSnackbarMessage('Error submitting program solution. Please try again.');
+          setSnackbarSeverity('error');
+          setSnackbarOpen(true);
         }
       }
       // Reset the form after successful submission
@@ -162,18 +164,26 @@ const ManageQuestions = () => {
         answerOption: '',
         programmingDetails: '',
       });
+
+      // Success message
+      setSnackbarMessage('Question submitted successfully!');
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
+
     } catch (error) {
       console.error('Error submitting question:', error);
       setSnackbarMessage('Error submitting question. Please try again.');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
     }
-
   }
+
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
 
   return (
-    <Box sx={{ padding: 3, marginLeft: 6 }}>
+    <Box sx={{ padding: 3, marginLeft: 4 }}>
       <Typography variant="h4" gutterBottom>
         Manage Questions
       </Typography>
@@ -202,11 +212,15 @@ const ManageQuestions = () => {
               onChange={handleInputChange}
               label="Category"
             >
-              {categories.map((category) => (
-                <MenuItem key={category.categoryId} value={category.categoryId}>
-                  {category.categoryName}
-                </MenuItem>
-              ))}
+              {categories.length > 0 ? (
+                categories.map((category) => (
+                  <MenuItem key={category.categoryId} value={category.categoryId}>
+                    {category.categoryName}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>No categories available</MenuItem>
+              )}
             </Select>
           </FormControl>
         </Grid>
@@ -222,11 +236,15 @@ const ManageQuestions = () => {
                   label="Difficulty"
                   required
                 >
-                  {difficulties.map((difficulty) => (
-                    <MenuItem key={difficulty.difficultyLevelId} value={difficulty.difficultyLevelId}>
-                      {difficulty.difficultyLevel}
-                    </MenuItem>
-                  ))}
+                  {difficulties.length > 0 ? (
+                    difficulties.map((difficulty) => (
+                      <MenuItem key={difficulty.difficultyLevelId} value={difficulty.difficultyLevelId}>
+                        {difficulty.difficultyLevel}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No difficulties available</MenuItem>
+                  )}
                 </Select>
               </FormControl>
             </Grid>
@@ -298,10 +316,11 @@ const ManageQuestions = () => {
             Submit Question
           </Button>
           <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
-            <Alert onClose={handleSnackbarClose} severity="warning" sx={{ width: '100%' }}>
+            <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
               {snackbarMessage}
             </Alert>
           </Snackbar>
+
         </Grid>
       </Grid>
     </Box>

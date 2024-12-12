@@ -1,5 +1,7 @@
 package com.example.online_examination.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +24,7 @@ public class QuestionService {
 	@Autowired
 	private AnswerRepository answerRepository;
 
-	public Question addQuestionWithOptions(Question question) {
+	public Question addQuestion(Question question) {
 		return questionRepository.save(question);
 	}
 
@@ -32,5 +34,13 @@ public class QuestionService {
 
 	public Answer addAnswer(Answer answer) {
 		return answerRepository.save(answer);
+	}
+
+	public List<Question> findByCategory(Integer categoryId) {
+		return questionRepository.findByCategory(categoryId);
+	}
+
+	public List<Question> findByCategoryAndDifficulty(Integer categoryId, Integer difficultyLevelId) {
+		return questionRepository.findByCategoryAndDifficulty(categoryId, difficultyLevelId);
 	}
 }

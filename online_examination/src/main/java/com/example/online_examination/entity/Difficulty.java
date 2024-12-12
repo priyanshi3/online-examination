@@ -22,6 +22,11 @@ public class Difficulty {
 		// TODO Auto-generated constructor stub
 	}
 
+	// Constructor to accept only difficultyLevelId (for deserialization)
+	public Difficulty(Integer difficultyLevelId) {
+		this.difficultyLevelId = difficultyLevelId;
+	}
+
 	public Difficulty(Integer difficultyLevelId, String difficultyLevel) {
 		super();
 		this.difficultyLevelId = difficultyLevelId;

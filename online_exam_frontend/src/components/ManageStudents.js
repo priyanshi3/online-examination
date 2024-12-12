@@ -113,7 +113,7 @@ const ManageStudents = () => {
   };
 
   return (
-    <Box sx={{ padding: 3, marginLeft: 6 }}>
+    <Box sx={{ padding: 3, marginLeft: 5 }}>
       <Typography variant="h4" gutterBottom>
         Manage Students
       </Typography>

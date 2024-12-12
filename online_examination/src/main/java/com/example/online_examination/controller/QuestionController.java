@@ -1,9 +1,13 @@
 package com.example.online_examination.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.online_examination.entity.Category;
@@ -40,8 +44,18 @@ public class QuestionController {
 			question.setDifficultyLevelId(difficultyLevel);
 		}
 
-		Question newQuestion = questionService.addQuestionWithOptions(question);
+		Question newQuestion = questionService.addQuestion(question);
 		return newQuestion;
 	}
 
+	@GetMapping("/fetchForExam")
+	public List<Question> fetchForExam(@RequestParam int categoryId,
+			@RequestParam(required = false) int difficultyLevelId) {
+
+		if (difficultyLevelId == 0) {
+			return questionService.findByCategory(categoryId);
+		} else {
+			return questionService.findByCategoryAndDifficulty(categoryId, difficultyLevelId);
+		}
+	}
 }

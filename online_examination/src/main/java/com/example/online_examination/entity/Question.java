@@ -27,12 +27,6 @@ public class Question {
 	@JoinColumn(name = "difficulty_level_ID")
 	private Difficulty difficultyLevelId;
 
-//	@OneToMany(mappedBy = "questionId")
-//	private List<Options> options;
-//
-//	@OneToOne(mappedBy = "questionId")
-//	private Answer answer;
-
 	public Question() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -45,13 +39,6 @@ public class Question {
 		this.categoryId = categoryId;
 		this.difficultyLevelId = difficultyLevelId;
 	}
-
-//	public Question(Long questionId, String question, Category categoryId) {
-//		super();
-//		this.questionId = questionId;
-//		this.question = question;
-//		this.categoryId = categoryId;
-//	}
 
 	public Long getQuestionId() {
 		return questionId;
@@ -84,21 +71,5 @@ public class Question {
 	public void setDifficultyLevelId(Difficulty difficultyLevelId) {
 		this.difficultyLevelId = difficultyLevelId;
 	}
-
-//	public List<Options> getOptions() {
-//		return options;
-//	}
-//
-//	public void setOptions(List<Options> options) {
-//		this.options = options;
-//	}
-//
-//	public Answer getAnswer() {
-//		return answer;
-//	}
-//
-//	public void setAnswer(Answer answer) {
-//		this.answer = answer;
-//	}
 
 }

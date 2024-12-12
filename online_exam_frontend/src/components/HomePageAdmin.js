@@ -4,6 +4,7 @@ import { AppBar, Toolbar, Typography, List, ListItem, ListItemText, Container, B
 import { useNavigate } from 'react-router-dom';
 import ManageStudents from './ManageStudents';
 import ManageQuestions from './ManageQuestions';
+import ManageExam from './ManageExam';
 
 const HomePageAdmin = () => {
   const { authenticated, emailId } = useAuth();
@@ -23,7 +24,7 @@ const HomePageAdmin = () => {
       case 'questions':
         return <ManageQuestions />;
       case 'exams':
-        return <Typography align="center" sx={{ fontSize: '24px' }}>Exams Content</Typography>;
+        return <ManageExam />;
       default:
         return <Typography align="center" sx={{ fontSize: '24px' }}>Welcome, {emailId}</Typography>;
     }
@@ -46,7 +47,7 @@ const HomePageAdmin = () => {
       >
         <List>
           <ListItem>
-            <Typography variant="body1" sx={{ color: 'black', fontWeight: 'bold', textAlign: 'center', fontSize: '30px'}}>
+            <Typography variant="body1" sx={{ color: 'black', fontWeight: 'bold', textAlign: 'center', fontSize: '30px' }}>
               Welcome
             </Typography>
           </ListItem>
@@ -64,7 +65,7 @@ const HomePageAdmin = () => {
 
       <Box sx={{ flexGrow: 1, padding: 2 }}>
         <Toolbar />
-        <Container sx={{ marginTop: 4}}>
+        <Container sx={{ marginTop: 4 }}>
           {renderContent()} {/* Render content based on the selected item */}
         </Container>
       </Box>
