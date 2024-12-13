@@ -17,15 +17,23 @@ public class Exam {
 	@Column(name = "passing_criteria", nullable = false)
 	private Double passingCriteria;
 
+	@Column(name = "duration", nullable = false)
+	private Short duration;
+
+	@Column(name = "active", nullable = false)
+	private Boolean active;
+
 	public Exam() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public Exam(Long examId, Double passingCriteria) {
+	public Exam(Long examId, Double passingCriteria, Short duration, Boolean active) {
 		super();
 		this.examId = examId;
 		this.passingCriteria = passingCriteria;
+		this.duration = duration;
+		this.active = active;
 	}
 
 	public Long getExamId() {
@@ -42,6 +50,22 @@ public class Exam {
 
 	public void setPassingCriteria(Double passingCriteria) {
 		this.passingCriteria = passingCriteria;
+	}
+
+	public Short getDuration() {
+		return duration;
+	}
+
+	public void setDuration(Short duration) {
+		this.duration = duration;
+	}
+
+	public Boolean getActive() {
+		return active;
+	}
+
+	public void setActive(Boolean active) {
+		this.active = active;
 	}
 
 }

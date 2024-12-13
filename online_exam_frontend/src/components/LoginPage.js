@@ -22,7 +22,7 @@ const LoginPage = () => {
       if (responseStudent.data) {
         setAuthenticated(true);
         setEmailId(emailId);
-        // navigate('/exam');
+        navigate('/student');
       } else {
         const responseEmployee = await axios.post('http://localhost:8080/employee/login', {
           emailId: emailId,

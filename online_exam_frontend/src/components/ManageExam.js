@@ -42,6 +42,8 @@ function TabPanel(props) {
 const ManageExam = () => {
     const [value, setValue] = useState(0);
     const [passingCriteria, setPassingCriteria] = useState('');
+    const [duration, setDuration] = useState('');
+    const [active, setActive] = useState(false);
     const [category, setCategory] = useState(0);
     const [difficulty, setDifficulty] = useState(0);
     const [categories, setCategories] = useState([]);
@@ -95,6 +97,8 @@ const ManageExam = () => {
             setQuestions([]);   // To reset questions fetched
         } else if (name === 'difficulty') {
             setDifficulty(value);
+        } else if (name === 'duration') {
+            setDuration(value);
         }
     };
 
@@ -113,18 +117,21 @@ const ManageExam = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        // Ensure passingCriteria is a valid number (float or integer)
-        const passingCriteriaValue = parseFloat(passingCriteria);
-
-        if (isNaN(passingCriteriaValue)) {
+        if (isNaN(passingCriteria)) {
             setSnackbarMessage('Invalid Passing Criteria. Please enter a valid number.');
             setSnackbarSeverity('error');
             setSnackbarOpen(true);
             return;
         }
+        setActive(false);
+        const newExamData = {
+            passingCriteria: parseFloat(passingCriteria),
+            duration: parseInt(duration),
+            active: false
+        }
 
         try {
-            const response = await axios.post('http://localhost:8080/exam/createExam', { passingCriteria: passingCriteriaValue });
+            const response = await axios.post('http://localhost:8080/exam/createExam', newExamData);
 
             // Add questions to examQuestion
             for (let questionId of selectedQuestions) {
@@ -145,6 +152,8 @@ const ManageExam = () => {
             }
             // Reset all form fields after exam creation
             setPassingCriteria('');
+            setDuration('');
+            setActive(false);
             setCategory(0);
             setDifficulty(0);
             setSelectedQuestions([]);
@@ -184,7 +193,7 @@ const ManageExam = () => {
                 </Typography>
                 <form onSubmit={handleSubmit}>
                     <Grid container spacing={2}>
-                        <Grid item xs={12}>
+                        <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
                                 label="Passing Criteria"
@@ -193,6 +202,19 @@ const ManageExam = () => {
                                 onChange={(e) => setPassingCriteria(e.target.value)}
                                 required
                                 type="number"
+                            />
+                        </Grid>
+
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Duration (minutes)"
+                                variant="outlined"
+                                value={duration}
+                                onChange={handleInputChange}
+                                required
+                                type="number"
+                                name="duration"  // Added for the duration field
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>

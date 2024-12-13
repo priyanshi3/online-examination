@@ -18,10 +18,6 @@ public class ExamController {
 
 	@PostMapping("/createExam")
 	public Exam addExam(@RequestBody Exam exam) {
-		System.out.println(exam.getPassingCriteria());
-		if (exam.getPassingCriteria() == null) {
-			throw new IllegalArgumentException("Passing criteria cannot be null.");
-		}
 		return examService.addExam(exam);
 	}
 
