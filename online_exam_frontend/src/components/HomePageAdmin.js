@@ -7,9 +7,9 @@ import ManageQuestions from './ManageQuestions';
 import ManageExam from './ManageExam';
 
 const HomePageAdmin = () => {
-  const { authenticated, emailId } = useAuth();
+  const { authenticated, user } = useAuth();
   const navigate = useNavigate();
-
+  console.log("User : ", user);
   const [selectedItem, setSelectedItem] = useState('welcome');
 
   const handleMenuItemClick = (path, item) => {
@@ -26,7 +26,7 @@ const HomePageAdmin = () => {
       case 'exams':
         return <ManageExam />;
       default:
-        return <Typography align="center" sx={{ fontSize: '24px' }}>Welcome, {emailId}</Typography>;
+        return <Typography align="center" sx={{ fontSize: '24px' }}>Welcome, {user.emailId}</Typography>;
     }
   };
 
@@ -66,7 +66,7 @@ const HomePageAdmin = () => {
       <Box sx={{ flexGrow: 1, padding: 2 }}>
         <Toolbar />
         <Container sx={{ marginTop: 4 }}>
-          {renderContent()} {/* Render content based on the selected item */}
+          {renderContent()}
         </Container>
       </Box>
     </Box>

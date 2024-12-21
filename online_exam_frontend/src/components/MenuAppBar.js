@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const MenuAppBar = () => {
-  const { authenticated, setAuthenticated, emailId } = useAuth();
+  const { authenticated, setAuthenticated, user } = useAuth();
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
 
@@ -29,7 +29,7 @@ const MenuAppBar = () => {
     localStorage.removeItem('emailId');
     handleClose();
     navigate('/');
-};
+  };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -46,7 +46,7 @@ const MenuAppBar = () => {
             {authenticated ? (
               <>
                 <Typography variant="body1" sx={{ color: 'white', marginRight: 2 }}>
-                  {emailId}
+                  {user.emailId}
                 </Typography>
                 <IconButton
                   size="large"

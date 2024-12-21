@@ -6,12 +6,12 @@ export const AuthProvider = ({ children }) => {
   // Initialize state from localStorage
   const [authenticated, setAuthenticated] = useState(() => {
     const saved = localStorage.getItem('authenticated');
-    return saved === 'true'; // Convert string to boolean
+    return saved === 'true';
   });
 
-  // Initialize emailId from localStorage
-  const [emailId, setEmailId] = useState(() => {
-    return localStorage.getItem('emailId') || '';
+  // Initialize user from localStorage
+  const [user, setUser] = useState(() => {
+    return localStorage.getItem('user') || 'n';
   });
 
   // update localStorage 
@@ -20,11 +20,11 @@ export const AuthProvider = ({ children }) => {
   }, [authenticated]);
 
   useEffect(() => {
-    localStorage.setItem('emailId', emailId);
-  }, [emailId]);
+    localStorage.setItem('user', user);
+  }, [user]);
 
   return (
-    <AuthContext.Provider value={{ authenticated, setAuthenticated, emailId, setEmailId }}>
+    <AuthContext.Provider value={{ authenticated, setAuthenticated, user, setUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
-  const { setAuthenticated, setEmailId } = useAuth();
+  const { setAuthenticated, setUser } = useAuth();
   const navigate = useNavigate();
 
   const [emailId, setEmailID] = useState('');
@@ -21,7 +21,7 @@ const LoginPage = () => {
       }); // check if the user is student
       if (responseStudent.data) {
         setAuthenticated(true);
-        setEmailId(emailId);
+        setUser(responseStudent.data);
         navigate('/student');
       } else {
         const responseEmployee = await axios.post('http://localhost:8080/employee/login', {
@@ -29,7 +29,7 @@ const LoginPage = () => {
         }); // check if the user is employee
         if (responseEmployee.data) {
           setAuthenticated(true);
-          setEmailId(emailId);
+          setUser(responseEmployee.data);
           navigate('/home');
         }
         else {
@@ -66,8 +66,8 @@ const LoginPage = () => {
             autoComplete="email"
             autoFocus
             variant="outlined"
-            error={!!error} // Show error if there's an error message
-            helperText={error} // Display error message
+            error={!!error}
+            helperText={error}
             sx={{ backgroundColor: 'white' }}
           />
           <Button type="submit" fullWidth variant="contained" color="primary" sx={{ mt: 3, mb: 2 }}>

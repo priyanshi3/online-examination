@@ -8,6 +8,7 @@ import ManageStudents from './components/ManageStudents';
 import ManageQuestions from './components/ManageQuestions';
 import ManageExam from './components/ManageExam';
 import HomePageStudent from './components/HomePageStudent';
+import Exam from './components/Exam';
 
 const App = () => {
   return (
@@ -24,7 +25,7 @@ const App = () => {
           </Route>
 
           <Route path="/student" element={<HomePageStudent />}>
-
+            <Route path="exam" element={<Exam />} />  // give exam by student
           </Route>
         </Routes>
       </Router>

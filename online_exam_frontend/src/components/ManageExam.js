@@ -82,7 +82,7 @@ const ManageExam = () => {
     // Fetch questions based on category and difficulty
     const fetchQuestions = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/question/fetchForExam?categoryId=` + category + "&difficultyLevelId=" + difficulty);
+            const response = await axios.get(`http://localhost:8080/question/fetchToCreateExam?categoryId=` + category + "&difficultyLevelId=" + difficulty);
             setQuestions(response.data);
         } catch (error) {
             console.error('Error fetching questions:', error);
@@ -184,6 +184,7 @@ const ManageExam = () => {
             <AppBar position="static" sx={{ backgroundColor: 'white', boxShadow: 'none' }}>
                 <Tabs value={value} onChange={handleChange} aria-label="exam management tabs">
                     <Tab label="Create Exam" sx={{ color: '#3f51b5', fontSize: '1.01rem' }} />
+                    <Tab label="Assess Program" sx={{ color: '#3f51b5', fontSize: '1.01rem' }} />
                     <Tab label="Results" sx={{ color: '#3f51b5', fontSize: '1.01rem' }} />
                 </Tabs>
             </AppBar>
@@ -214,7 +215,7 @@ const ManageExam = () => {
                                 onChange={handleInputChange}
                                 required
                                 type="number"
-                                name="duration"  // Added for the duration field
+                                name="duration"
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
@@ -293,11 +294,17 @@ const ManageExam = () => {
                 </Snackbar>
             </TabPanel>
 
+            {/* Assess Program */}
             <TabPanel value={value} index={1}>
+                <Typography variant="h6" gutterBottom>
+                    Program
+                </Typography>
+            </TabPanel>
+
+            <TabPanel value={value} index={2}>
                 <Typography variant="h6" gutterBottom>
                     Exam Results
                 </Typography>
-                {/* Add results display logic here */}
             </TabPanel>
         </Box>
     );
