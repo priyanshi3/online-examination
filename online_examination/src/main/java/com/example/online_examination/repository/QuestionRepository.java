@@ -19,4 +19,5 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 	@Query("SELECT q FROM Question q WHERE q.categoryId.categoryId = :categoryId "
 			+ "AND (:difficultyLevelId IS NULL OR q.difficultyLevelId.difficultyLevelId = :difficultyLevelId)")
 	List<Question> findByCategoryAndDifficulty(Integer categoryId, Integer difficultyLevelId);
+
 }

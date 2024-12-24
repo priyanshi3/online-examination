@@ -36,6 +36,7 @@ public class QuestionService {
 		return answerRepository.save(answer);
 	}
 
+	// fetch questions to create exam
 	public List<Question> findByCategory(Integer categoryId) {
 		return questionRepository.findByCategory(categoryId);
 	}
@@ -43,4 +44,5 @@ public class QuestionService {
 	public List<Question> findByCategoryAndDifficulty(Integer categoryId, Integer difficultyLevelId) {
 		return questionRepository.findByCategoryAndDifficulty(categoryId, difficultyLevelId);
 	}
+
 }

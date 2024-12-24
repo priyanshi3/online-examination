@@ -1,5 +1,6 @@
 package com.example.online_examination.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.online_examination.entity.Category;
 import com.example.online_examination.entity.Difficulty;
+import com.example.online_examination.entity.ExamQuestion;
 import com.example.online_examination.entity.Question;
 import com.example.online_examination.repository.CategoryRepository;
 import com.example.online_examination.repository.DifficultyRepository;
+import com.example.online_examination.repository.ExamQuestionRepository;
 import com.example.online_examination.service.QuestionService;
 
 @RestController
@@ -29,6 +32,9 @@ public class QuestionController {
 
 	@Autowired
 	private DifficultyRepository difficultyRepository;
+
+	@Autowired
+	private ExamQuestionRepository examQuestionRepository;
 
 	@PostMapping("/addQuestion")
 	public Question addQuestion(@RequestBody Question question) {
@@ -48,8 +54,9 @@ public class QuestionController {
 		return newQuestion;
 	}
 
-	@GetMapping("/fetchForExam")
-	public List<Question> fetchForExam(@RequestParam int categoryId,
+	// fetch questions to create exam
+	@GetMapping("/fetchToCreateExam")
+	public List<Question> fetchToCreateExam(@RequestParam int categoryId,
 			@RequestParam(required = false) int difficultyLevelId) {
 
 		if (difficultyLevelId == 0) {
@@ -57,5 +64,17 @@ public class QuestionController {
 		} else {
 			return questionService.findByCategoryAndDifficulty(categoryId, difficultyLevelId);
 		}
+	}
+
+	// fetch questions for exam from active exam
+	@GetMapping("/fetchQuestionForExam")
+	public List<Question> fetchQuestionForExam(@RequestParam int examId) {
+		List<ExamQuestion> questionIds = examQuestionRepository.fetchForExam(examId);
+
+		List<Question> questions = new ArrayList<>();
+		for (ExamQuestion question : questionIds) {
+			questions.add(question.getQuestion());
+		}
+		return questions;
 	}
 }

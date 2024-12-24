@@ -24,7 +24,7 @@ public class StudentService {
 		return studentRepository.findAll();
 	}
 
-	public Boolean studentExist(String emailId) {
+	public Student studentExist(String emailId) {
 		return studentRepository.existsByEmailId(emailId);
 	}
 
@@ -35,12 +35,12 @@ public class StudentService {
 			throw new ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND, "Student not found");
 		}
 		Student updatedStudent = std.get();
-        updatedStudent.setFirstName(student.getFirstName());
-        updatedStudent.setLastName(student.getLastName());
-        updatedStudent.setEmailId(student.getEmailId());
-        updatedStudent.setPhoneNumber(student.getPhoneNumber());
-        updatedStudent.setCpi(student.getCpi());
-        return studentRepository.save(updatedStudent);
+		updatedStudent.setFirstName(student.getFirstName());
+		updatedStudent.setLastName(student.getLastName());
+		updatedStudent.setEmailId(student.getEmailId());
+		updatedStudent.setPhoneNumber(student.getPhoneNumber());
+		updatedStudent.setCpi(student.getCpi());
+		return studentRepository.save(updatedStudent);
 	}
 
 }

@@ -13,12 +13,12 @@ import com.example.online_examination.service.EmployeeService;
 @RequestMapping("/employee")
 public class EmployeeController {
 
-	@Autowired 
+	@Autowired
 	private EmployeeService employeeService;
-	
-	//check for valid employee for login
+
+	// check for valid employee for login
 	@PostMapping("/login")
-	public Boolean studentExist(@RequestBody Employee employee) {
+	public Employee studentExist(@RequestBody Employee employee) {
 		return employeeService.employeeExist(employee.getEmailId().trim());
 	}
 

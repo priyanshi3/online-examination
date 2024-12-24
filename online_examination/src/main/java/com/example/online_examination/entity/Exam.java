@@ -1,10 +1,16 @@
 package com.example.online_examination.entity;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Exam {
@@ -22,6 +28,10 @@ public class Exam {
 
 	@Column(name = "active", nullable = false)
 	private Boolean active;
+
+	@OneToMany(mappedBy = "exam", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	@JsonManagedReference // As Jackson keeps excessive recursing for bidirectional relationships
+	private List<ExamQuestion> examQuestions;
 
 	public Exam() {
 		super();
@@ -66,6 +76,14 @@ public class Exam {
 
 	public void setActive(Boolean active) {
 		this.active = active;
+	}
+
+	public List<ExamQuestion> getExamQuestions() {
+		return examQuestions;
+	}
+
+	public void setExamQuestions(List<ExamQuestion> examQuestions) {
+		this.examQuestions = examQuestions;
 	}
 
 }

@@ -42,7 +42,7 @@ public class StudentController {
 
 	// check for valid student for login
 	@PostMapping("/login")
-	public Boolean studentExist(@RequestBody Student student) {
+	public Student studentExist(@RequestBody Student student) {
 		return studentService.studentExist(student.getEmailId().trim());
 	}
 }

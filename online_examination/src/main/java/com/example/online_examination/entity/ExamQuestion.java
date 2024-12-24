@@ -1,5 +1,7 @@
 package com.example.online_examination.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,6 +20,7 @@ public class ExamQuestion {
 
 	@ManyToOne
 	@JoinColumn(name = "exam_ID", nullable = false)
+	@JsonBackReference // As Jackson keeps excessive recursing for bidirectional relationships
 	private Exam exam;
 
 	@ManyToOne
