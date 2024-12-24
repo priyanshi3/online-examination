@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
 
   // Initialize user from localStorage
   const [user, setUser] = useState(() => {
-    return localStorage.getItem('user') || 'n';
+    return localStorage.getItem('user') || '';
   });
 
   // update localStorage 

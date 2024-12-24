@@ -9,7 +9,6 @@ import ManageExam from './ManageExam';
 const HomePageAdmin = () => {
   const { authenticated, user } = useAuth();
   const navigate = useNavigate();
-  console.log("User : ", user);
   const [selectedItem, setSelectedItem] = useState('welcome');
 
   const handleMenuItemClick = (path, item) => {

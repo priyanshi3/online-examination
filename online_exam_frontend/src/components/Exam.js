@@ -17,17 +17,21 @@ import {
     Avatar,
     Grid,
     TextField,
-    Toolbar
+    Toolbar,
+    Snackbar,
+    Alert,
 } from '@mui/material';
 import axios from 'axios';
 
 const Exam = () => {
     const { user } = useAuth();
     const { exam, setExam } = useContext(ExamContext);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const [questions, setQuestions] = useState([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [answers, setAnswers] = useState([]);
-    // const [programAnswers, setProgramAnswers] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -107,14 +111,22 @@ const Exam = () => {
     };
 
     const handleSubmitExam = async () => {
-        const answerToSend = {
-            answers: answers,
-            studentId: user.studentId
+        try {
+            await axios.post(`http://localhost:8080/answer/submitAnswer?studentId=${user.studentId}`, answers);
+            setSnackbarMessage('Exam submitted successfully!');
+            setSnackbarSeverity('success');
+            setSnackbarOpen(true);
+        } catch (error) {
+            console.error(`Error submitting exam:`, error);
+            setSnackbarMessage('Error submitting exam. Please try again.');
+            setSnackbarSeverity('error');
+            setSnackbarOpen(true);
+            return;
         }
+    };
 
-        await axios.post('http://localhost:8080/answer/submitAnswer', answerToSend)
-            .then(response => console.log('Submitted successfully!', response))
-            .catch(error => console.error('Submission error:', error));
+    const handleSnackbarClose = () => {
+        setSnackbarOpen(false);
     };
 
     if (loading) {
@@ -247,6 +259,11 @@ const Exam = () => {
                         </Button>
                     </Box>
                 </Container>
+                <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
+                    <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                        {snackbarMessage}
+                    </Alert>
+                </Snackbar>
             </Box>
         </Box>
     );
