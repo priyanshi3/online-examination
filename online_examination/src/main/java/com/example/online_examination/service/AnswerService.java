@@ -1,5 +1,7 @@
 package com.example.online_examination.service;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,19 +25,20 @@ public class AnswerService {
 		return answerRepository.save(answer);
 	}
 
-	int countLogical = 0;
-	int countTechnical = 0;
+	public Map<String, Short> checkAnswer(AnswerDTO ans, Question question, Student student,
+			Map<String, Short> scores) {
 
-	public void checkAnswer(AnswerDTO ans, Question question, Student student) {
+		short logical = scores.get("countLogical");
+		short technical = scores.get("countTechnical");
 
 		switch (question.getCategoryId().getCategoryName()) {
 		case "Logical":
-			countLogical += answerRepository
-					.checkLogicalAndTechnical(ans.getQuestionId(), Long.valueOf(ans.getOptionId())).orElse(0);
+			logical += answerRepository.checkLogicalAndTechnical(ans.getQuestionId(), Long.valueOf(ans.getOptionId()))
+					.orElse(0);
 			break;
 		case "Technical":
-			countTechnical += answerRepository
-					.checkLogicalAndTechnical(ans.getQuestionId(), Long.valueOf(ans.getOptionId())).orElse(0);
+			technical += answerRepository.checkLogicalAndTechnical(ans.getQuestionId(), Long.valueOf(ans.getOptionId()))
+					.orElse(0);
 			break;
 		case "Programming":
 			ProgramCheck newProgramCode = new ProgramCheck();
@@ -46,6 +49,11 @@ public class AnswerService {
 			programCheckService.saveProgramCode(newProgramCode);
 			break;
 		}
-		System.out.println("log : " + countLogical + " tech: " + countTechnical);
+
+		scores.put("countLogical", logical);
+		scores.put("countTechnical", technical);
+
+		return scores;
+
 	}
 }

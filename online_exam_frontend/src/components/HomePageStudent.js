@@ -9,6 +9,7 @@ const HomePageStudent = () => {
 
   const [exam, setExam] = useState(null);
   const [examStarted, setExamStarted] = useState(false);
+  // const [examAttempted, setExamAttempted] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {

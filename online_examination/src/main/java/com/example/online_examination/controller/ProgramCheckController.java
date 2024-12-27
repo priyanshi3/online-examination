@@ -23,12 +23,15 @@ public class ProgramCheckController {
 	// fetch to set marks
 	@GetMapping("/fetchAll")
 	public List<ProgramCheck> fecthAllToCheck() {
+		System.out.println("------------------------------------");
+		System.out.println(programCheckService.fecthAllToCheck());
 		return programCheckService.fecthAllToCheck();
 	}
 
 	// update marks
-	@PutMapping("/update/{id}")
-	public void updateProgramCheck(@PathVariable("id") Long programCheckId, @RequestBody Short marks) {
-		programCheckService.updateMarks(programCheckId, marks);
+	@PutMapping("/update/{id}/{examId}")
+	public void updateProgramCheck(@PathVariable("id") Long programCheckId, @PathVariable("examId") Long examId,
+			@RequestBody Short marks) {
+		programCheckService.updateMarks(programCheckId, examId, marks);
 	}
 }

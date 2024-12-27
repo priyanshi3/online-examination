@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
     Box,
     Typography,
@@ -63,10 +63,16 @@ const ManageExam = () => {
     const [selectedQuestions, setSelectedQuestions] = useState([]);
     // to activate exam
     const [exams, setExams] = useState([]);
+    const [activeExam, setActiveExam] = useState({});
     // to assess program
     const [programCodes, setProgramCodes] = useState([]);
     const [marks, setMarks] = useState({});
     const [finalMarks, setFinalMarks] = useState({});
+    // to view result
+    const [results, setResults] = useState([]);
+    const [filterPassing, setFilterPassing] = useState(false);
+    const [sortTotalScore, setSortTotalScore] = useState(false);
+    const [filteredResults, setFilteredResults] = useState(results);
 
     // Fetch categories
     const fetchCategories = async () => {
@@ -93,6 +99,7 @@ const ManageExam = () => {
         try {
             const response = await axios.get('http://localhost:8080/exam/fetchAll');
             setExams(response.data);
+            response.data.map((exam) => exam.active ? setActiveExam(exam) : null);
         } catch (error) {
             console.error('Error fetching exams:', error);
         }
@@ -108,12 +115,29 @@ const ManageExam = () => {
         }
     }
 
+    // fetch all results for active exam
+    const fetchResults = async () => {
+        try {
+            const response = await axios.get(`http://localhost:8080/result/fetchAllByExam?examId=${parseInt(activeExam.examId)}`);
+            setResults(response.data);
+            setFilteredResults(response.data);
+        } catch (error) {
+            console.error("Error fecthing result: ", error);
+        }
+    }
+
     useEffect(() => {
         fetchCategories();
         fetchDifficulties();
         fetchExams();
         fetchProgramCodes();
     }, []);
+
+    useEffect(() => {
+        if (activeExam) {
+            fetchResults(); // Fetch results only after activeExam is set
+        }
+    }, [activeExam]);
 
     // Fetch questions based on category and difficulty
     const fetchQuestions = async () => {
@@ -221,11 +245,16 @@ const ManageExam = () => {
     }, [category, difficulty]);
 
     // To activate exam
-    const handleExamOperation = async (operation, examId) => {
+    const handleExamOperation = async (operation, exam) => {
         try {
-            await axios.put(`http://localhost:8080/exam/manageExam/${examId}?operation=${operation}`);
+            await axios.put(`http://localhost:8080/exam/manageExam/${exam.examId}?operation=${operation}`);
             fetchExams();
-
+            if (operation === 'activate') {
+                setActiveExam(exam);
+            }
+            else if (operation === 'deactivate') {
+                setActiveExam(null);
+            }
             setSnackbarMessage(
                 operation === 'activate'
                     ? 'Exam activated successfully!'
@@ -250,7 +279,7 @@ const ManageExam = () => {
     const handleMarksChange = async (programCheckId) => {
         const markToSend = marks[programCheckId] || 0;
         try {
-            await axios.put(`http://localhost:8080/programCheck/update/${programCheckId}`, markToSend,
+            await axios.put(`http://localhost:8080/programCheck/update/${programCheckId}/${parseInt(activeExam.examId)}`, markToSend,
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -263,12 +292,38 @@ const ManageExam = () => {
             setSnackbarMessage('Marks updated successfully!');
             setSnackbarSeverity('success');
             setSnackbarOpen(true);
+            fetchResults();
         } catch (error) {
             console.error('Error updating marks:', error);
             setSnackbarMessage('Failed to update marks. Please try again.');
             setSnackbarSeverity('error');
             setSnackbarOpen(true);
         }
+    };
+
+    // to filter the exam result
+    const applyFilters = () => {
+        let filtered = [...results];
+
+        // Filter by passing score
+        if (filterPassing && results[0].exam.passingCriteria) {
+            const passing = parseInt(results[0].exam.passingCriteria, 10);
+            filtered = filtered.filter((result) => result.totalScore >= passing);
+        }
+
+        // Sort by total score (high to low)
+        if (sortTotalScore) {
+            filtered.sort((a, b) => b.totalScore - a.totalScore);
+        }
+
+        setFilteredResults(filtered);
+    };
+
+    // reset filters
+    const resetFilters = () => {
+        setFilterPassing(false);
+        setSortTotalScore(false);
+        setFilteredResults(results);
     };
 
     return (
@@ -415,7 +470,7 @@ const ManageExam = () => {
                                             <Button
                                                 variant="contained"
                                                 color="secondary"
-                                                onClick={() => handleExamOperation('deactivate', exam.examId)}
+                                                onClick={() => handleExamOperation('deactivate', exam)}
                                             >
                                                 Deactivate
                                             </Button>
@@ -423,7 +478,7 @@ const ManageExam = () => {
                                             <Button
                                                 variant="contained"
                                                 color="primary"
-                                                onClick={() => handleExamOperation('activate', exam.examId)}
+                                                onClick={() => handleExamOperation('activate', exam)}
                                             >
                                                 Activate
                                             </Button>
@@ -432,7 +487,7 @@ const ManageExam = () => {
                                             variant="contained"
                                             color="error"
                                             sx={{ marginLeft: 1 }}
-                                            onClick={() => handleExamOperation('delete', exam.examId)}
+                                            onClick={() => handleExamOperation('delete', exam)}
                                         >
                                             Delete
                                         </Button>
@@ -554,6 +609,65 @@ const ManageExam = () => {
                 <Typography variant="h6" gutterBottom>
                     Exam Results
                 </Typography>
+                {/* Filter and Sort Controls */}
+                <Box sx={{ display: 'flex', gap: 2, marginBottom: 2, flexWrap: 'wrap' }}>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={filterPassing}
+                                onChange={(e) => setFilterPassing(e.target.checked)}
+                            />
+                        }
+                        label="Filter by Passing Criteria"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={sortTotalScore}
+                                onChange={(e) => setSortTotalScore(e.target.checked)}
+                            />
+                        }
+                        label="Sort by Total Score (High to Low)"
+                    />
+                    <Button variant="contained" onClick={applyFilters}>
+                        Apply Filters
+                    </Button>
+                    <Button variant="outlined" onClick={resetFilters}>
+                        Reset Filters
+                    </Button>
+                </Box>
+                <TableContainer component={Paper}>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell sx={{ fontWeight: 'bold' }}>Exam</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}>Student</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}>Logical Score</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}>Technical Score</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}>Program Score</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}>Total Score</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {filteredResults.map((result) => (
+                                <TableRow key={result.resultId}>
+                                    <TableCell>{result.exam.examId}</TableCell>
+                                    <TableCell sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{result.student.lastName + " " + result.student.firstName}</TableCell>
+                                    <TableCell>{result.logicalScore}</TableCell>
+                                    <TableCell>{result.technicalScore}</TableCell>
+                                    <TableCell>{result.programScore}</TableCell>
+                                    <TableCell>{result.totalScore}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+
+                {/* <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
+                    <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                        {snackbarMessage}
+                    </Alert>
+                </Snackbar> */}
             </TabPanel>
         </Box>
     );
