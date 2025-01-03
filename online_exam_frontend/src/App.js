@@ -9,6 +9,7 @@ import ManageQuestions from './components/ManageQuestions';
 import ManageExam from './components/ManageExam';
 import HomePageStudent from './components/HomePageStudent';
 import Exam from './components/Exam';
+import ThankYouPage from './components/ThankYouPage';
 
 const App = () => {
   return (
@@ -26,6 +27,7 @@ const App = () => {
 
           <Route path="/student" element={<HomePageStudent />}>
             <Route path="exam" element={<Exam />} />  // give exam by student
+            <Route path="thankYou" element={<ThankYouPage />} />   // after submitting exam
           </Route>
         </Routes>
       </Router>

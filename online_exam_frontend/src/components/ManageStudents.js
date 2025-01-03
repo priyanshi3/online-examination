@@ -16,8 +16,14 @@ import {
   Snackbar,
   Alert,
 } from '@mui/material';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { styled } from '@mui/material/styles';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 const ManageStudents = () => {
+  const { authenticated } = useAuth();
+  const navigate = useNavigate();
   const [newStudent, setNewStudent] = useState({
     firstName: '',
     lastName: '',
@@ -31,6 +37,13 @@ const ManageStudents = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
+  const [file, setFile] = useState(null);
+
+  useEffect(() => {
+    if (!authenticated) {
+      navigate('/');
+    }
+  }, [authenticated, navigate]);
 
   // Fetch students from database
   const fetchStudents = async () => {
@@ -101,6 +114,34 @@ const ManageStudents = () => {
     setIsEditing(true);
 
   };
+  // import excel file
+  const handleFileChange = (event) => {
+    setFile(event.target.files[0]);
+  };
+
+  const handleImport = async () => {
+    if (!file) {
+      setSnackbarMessage('Please select a file to upload.');
+      setSnackbarOpen(true);
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      await axios.post('http://localhost:8080/student/import', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setSnackbarMessage('File imported successfully.');
+      setSnackbarOpen(true);
+      fetchStudents();
+      setFile(null);
+    } catch (error) {
+      setSnackbarMessage('Error importing file: ' + error.message);
+      setSnackbarOpen(true);
+    }
+  };
 
   const resetForm = () => {
     setNewStudent({ firstName: '', lastName: '', emailId: '', phoneNumber: '', cpi: '' });
@@ -112,11 +153,63 @@ const ManageStudents = () => {
     setSnackbarOpen(false);
   };
 
+  // for MUI upload button
+  const VisuallyHiddenInput = styled('input')({
+    clip: 'rect(0 0 0 0)',
+    clipPath: 'inset(50%)',
+    height: 1,
+    overflow: 'hidden',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    whiteSpace: 'nowrap',
+    width: 1,
+  });
+
   return (
     <Box sx={{ padding: 3, marginLeft: 5 }}>
       <Typography variant="h4" gutterBottom>
         Manage Students
       </Typography>
+
+      {/* Import Section */}
+      <Grid container spacing={2} sx={{ marginBottom: 4 }}>
+        <Grid item xs={12} sm={6}>
+          <Typography variant="h6">Import Students from Excel</Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, marginTop: 2 }}>
+            <Button
+              component="label"
+              role={undefined}
+              variant="outlined"
+              tabIndex={-1}
+              startIcon={<CloudUploadIcon />}
+              sx={{
+                '&:hover': {
+                  backgroundColor: 'primary.main',
+                  color: 'white',
+                },
+              }}
+            >
+              Upload file
+              <input
+                type="file"
+                onChange={handleFileChange}
+                hidden
+              />
+            </Button>
+            <Typography variant="body2" sx={{ fontStyle: 'italic', fontSize: 17, flexGrow: 1 }}>
+              {file?.name || 'No file selected'}
+            </Typography>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleImport}
+            >
+              Import
+            </Button>
+          </Box>
+        </Grid>
+      </Grid>
 
       {/* Form to add or update student */}
       <Grid container spacing={2}>

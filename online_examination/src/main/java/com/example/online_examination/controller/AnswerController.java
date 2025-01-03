@@ -95,7 +95,6 @@ public class AnswerController {
 			}
 
 		}
-		System.out.println("log: " + scores.get("countLogical") + " tec: " + scores.get("countTechnical"));
 
 		Exam exam = examRepository.findById(examId).orElseThrow(() -> new RuntimeException("Exam not found"));
 

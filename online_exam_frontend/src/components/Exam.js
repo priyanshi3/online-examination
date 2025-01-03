@@ -20,25 +20,38 @@ import {
     Toolbar,
     Snackbar,
     Alert,
+    MenuItem,
+    Select,
+    InputLabel,
 } from '@mui/material';
 import axios from 'axios';
 import { useTimer } from 'react-timer-hook';
+import { useNavigate } from 'react-router-dom';
+import MonacoEditor from '@monaco-editor/react';
 
-function MyTimer({ expiryTimestamp }) {
+function MyTimer({ expiryTimestamp, onPause, handleSubmitExam }) {
     const {
-        totalSeconds,
         seconds,
         minutes,
         hours,
         days,
-        isRunning,
-        start,
         pause,
-        resume,
-        restart,
-    } = useTimer({ expiryTimestamp, onExpire: () => console.warn('onExpire called') });
+    } = useTimer({
+        expiryTimestamp,
+        onExpire: () => {
+            handleSubmitExam();
+        }
+    });
+
+    React.useEffect(() => {
+        if (onPause) {
+            onPause(() => pause);
+        }
+    }, [pause, onPause]);
+
 
     return (
+
         <Box
             sx={{
                 position: 'fixed',
@@ -61,12 +74,15 @@ function MyTimer({ expiryTimestamp }) {
                 {days}:{hours}:{minutes}:{seconds}
             </Typography>
         </Box>
+
     );
 }
 
 const Exam = () => {
-    const { user } = useAuth();
+    const navigate = useNavigate();
+    const { authenticated, user } = useAuth();
     const { exam, setExam } = useContext(ExamContext);
+    const [pauseFunction, setPauseFunction] = useState(null);       // to pause the timer and submit exam
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
@@ -74,9 +90,17 @@ const Exam = () => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [answers, setAnswers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [editorLanguage, setEditorLanguage] = useState('javascript');
+
     // for timer
     const time = new Date();
     time.setSeconds(time.getSeconds() + 60 * (exam.duration));
+
+    useEffect(() => {
+        if (!authenticated) {
+            navigate('/');
+        }
+    }, [authenticated, navigate]);
 
     useEffect(() => {
         const fetchQuestions = async () => {
@@ -118,16 +142,38 @@ const Exam = () => {
         // Handle visibility change (when switching tabs)
         const handleVisibilityChange = () => {
             if (document.hidden) {
-                // alert('You cannot switch to another tab during the exam!');
+                alert('You cannot switch to another tab during the exam!');
+                if (pauseFunction) {
+                    pauseFunction();
+                    handleSubmitExam();
+                } else {
+                    console.warn("Pause function is not available.");
+                }
             }
         };
         document.addEventListener('visibilitychange', handleVisibilityChange);
 
+        // Disable certain keys
+        const disableKeys = (event) => {
+            const forbiddenKeys = ['Alt', 'Meta'];
+
+            if (forbiddenKeys.includes(event.key) || event.altKey || event.metaKey) {
+                event.preventDefault();
+                alert('This key combination is disabled during the exam.');
+            }
+        };
+
+        // Add the event listener
+        document.addEventListener('keydown', disableKeys);
+
+
+
         return () => {
             document.removeEventListener('contextmenu', preventContextMenu);
             document.removeEventListener('visibilitychange', handleVisibilityChange);
+            document.removeEventListener('keydown', disableKeys);
         };
-    }, []);
+    }, [pauseFunction]);
 
     const handleAnswerChange = (event) => {
         const updatedAnswers = [...answers];
@@ -136,6 +182,19 @@ const Exam = () => {
             optionId: event.target.value
         };
         setAnswers(updatedAnswers);
+    };
+
+    const handleProgrammingAnswerChange = (value) => {
+        const updatedAnswers = [...answers];
+        updatedAnswers[currentQuestionIndex] = {
+            ...answers[currentQuestionIndex],
+            optionId: value,
+        };
+        setAnswers(updatedAnswers);
+    };
+
+    const isQuestionAnswered = (index) => {
+        return answers[index]?.optionId !== null && answers[index]?.optionId !== '';
     };
 
     const handleNextQuestion = () => {
@@ -152,6 +211,10 @@ const Exam = () => {
 
     const handleSelectQuestion = (index) => {
         setCurrentQuestionIndex(index);
+    };
+
+    const handleLanguageChange = (event) => {
+        setEditorLanguage(event.target.value);
     };
 
     const handleSubmitExam = async () => {
@@ -172,6 +235,7 @@ const Exam = () => {
             setSnackbarOpen(true);
             return;
         }
+        navigate('/student/thankYou');
     };
 
     const handleSnackbarClose = () => {
@@ -213,14 +277,14 @@ const Exam = () => {
                                         <Avatar
                                             sx={{
                                                 border: '2px solid',
-                                                borderColor: 'primary.main',
-                                                bgcolor: currentQuestionIndex === index ? 'blue' : 'transparent',
-                                                color: currentQuestionIndex === index ? 'white' : 'blue',
+                                                borderColor: isQuestionAnswered(index) ? 'green' : 'blue',
+                                                bgcolor: currentQuestionIndex === index ? isQuestionAnswered(index) ? 'green' : 'blue' : isQuestionAnswered(index) ? 'green' : 'transparent',
+                                                color: currentQuestionIndex === index ? 'white' : isQuestionAnswered(index) ? 'white' : 'blue',
                                                 width: 40,
                                                 height: 40,
                                                 cursor: 'pointer',
                                                 '&:hover': {
-                                                    bgcolor: 'primary.main',
+                                                    bgcolor: isQuestionAnswered(index) ? 'green' : 'blue',
                                                     color: 'white',
                                                 },
                                             }}
@@ -244,28 +308,58 @@ const Exam = () => {
                     flexGrow: 1, padding: 2, minWidth: '100vh', justifyContent: 'center', marginTop: 5
                 }}>
                     <Toolbar />
-                    <MyTimer expiryTimestamp={time} />
+                    {/* <MyTimer expiryTimestamp={time} onPause={setPauseFunction} handleSubmitExam={handleSubmitExam} /> */}
                     <Container sx={{ textAlign: 'left' }} >
 
                         <Typography variant="h5">{questions[currentQuestionIndex].question}</Typography>
 
                         {questions[currentQuestionIndex].categoryId.categoryName === 'Programming' ? (
-                            <TextField
-                                multiline
-                                rows={15}
-                                variant="outlined"
-                                fullWidth
-                                value={answers[currentQuestionIndex]?.optionId || ''}
-                                onChange={handleAnswerChange}
-                                placeholder="Your answer here..."
-                                sx={{
-                                    width: '100%',
-                                    backgroundColor: 'white',
-                                    fontFamily: 'monospace',
-                                    fontSize: '16px',
-                                    padding: 2
-                                }}
-                            />
+                            <>
+                                <FormControl sx={{ marginTop: '20px', minWidth: 120, height: '40px' }}>
+                                    <InputLabel id="language-select-label">Language</InputLabel>
+                                    <Select
+                                        value={editorLanguage}
+                                        onChange={handleLanguageChange}
+                                        label="Language"
+                                    >
+                                        <MenuItem value="javascript">JavaScript</MenuItem>
+                                        <MenuItem value="python">Python</MenuItem>
+                                        <MenuItem value="java">Java</MenuItem>
+                                        <MenuItem value="csharp">C#</MenuItem>
+                                        <MenuItem value="cpp">C++</MenuItem>
+                                        <MenuItem value="sql">SQL</MenuItem>
+                                    </Select>
+                                </FormControl>
+                                <Box sx={{ marginTop: '20px' }}>
+                                    <MonacoEditor
+                                        height="500px"
+                                        defaultLanguage={editorLanguage}
+                                        value={answers[currentQuestionIndex]?.optionId || ''}
+                                        onChange={handleProgrammingAnswerChange}
+                                        options={{
+                                            selectOnLineNumbers: true,
+                                            minimap: { enabled: false },
+                                        }}
+                                        theme="vs-dark"
+                                    />
+                                </Box>
+                            </>
+                            // <TextField
+                            //     multiline
+                            //     rows={15}
+                            //     variant="outlined"
+                            //     fullWidth
+                            //     value={answers[currentQuestionIndex]?.optionId || ''}
+                            //     onChange={handleAnswerChange}
+                            //     placeholder="Your answer here..."
+                            //     sx={{
+                            //         width: '100%',
+                            //         backgroundColor: 'white',
+                            //         fontFamily: 'monospace',
+                            //         fontSize: '16px',
+                            //         padding: 2
+                            //     }}
+                            // />
                         ) : (
                             <FormControl component="fieldset" sx={{ marginTop: '20px' }}>
                                 <RadioGroup
@@ -317,7 +411,6 @@ const Exam = () => {
                     </Snackbar>
                 </Box>
             </Box>
-            {/* <MyTimer expiryTimestamp={time} /> */}
         </>
     );
 };

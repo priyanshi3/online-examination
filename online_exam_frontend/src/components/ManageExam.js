@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Box,
     Typography,
@@ -25,6 +25,8 @@ import {
     Paper,
 } from '@mui/material';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -47,6 +49,8 @@ function TabPanel(props) {
 }
 
 const ManageExam = () => {
+    const { authenticated } = useAuth();      // for access without login
+    const navigate = useNavigate();
     const [value, setValue] = useState(0);  // for tabs
     const [active, setActive] = useState(false);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -73,6 +77,12 @@ const ManageExam = () => {
     const [filterPassing, setFilterPassing] = useState(false);
     const [sortTotalScore, setSortTotalScore] = useState(false);
     const [filteredResults, setFilteredResults] = useState(results);
+
+    useEffect(() => {
+        if (!authenticated) {
+            navigate('/');
+        }
+    }, [authenticated, navigate]);
 
     // Fetch categories
     const fetchCategories = async () => {

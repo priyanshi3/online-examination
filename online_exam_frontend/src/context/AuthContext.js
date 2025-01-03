@@ -5,22 +5,27 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   // Initialize state from localStorage
   const [authenticated, setAuthenticated] = useState(() => {
-    const saved = localStorage.getItem('authenticated');
+    const saved = sessionStorage.getItem('authenticated');
     return saved === 'true';
   });
 
   // Initialize user from localStorage
   const [user, setUser] = useState(() => {
-    return localStorage.getItem('user') || '';
+    const savedUser = sessionStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
   });
 
   // update localStorage 
   useEffect(() => {
-    localStorage.setItem('authenticated', authenticated);
+    sessionStorage.setItem('authenticated', authenticated);
   }, [authenticated]);
 
   useEffect(() => {
-    localStorage.setItem('user', user);
+    if (user) {
+      sessionStorage.setItem('user', JSON.stringify(user));
+    } else {
+      sessionStorage.removeItem('user');  // Remove user if logged out
+    }
   }, [user]);
 
   return (

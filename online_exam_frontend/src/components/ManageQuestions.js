@@ -15,8 +15,12 @@ import {
   FormControlLabel,
 } from '@mui/material';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const ManageQuestions = () => {
+  const { authenticated } = useAuth();
+  const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [difficulties, setDifficulties] = useState([]);
   const [newQuestion, setNewQuestion] = useState({
@@ -31,6 +35,12 @@ const ManageQuestions = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+
+  useEffect(() => {
+    if (!authenticated) {
+      navigate('/');
+    }
+  }, [authenticated, navigate]);
 
   useEffect(() => {
     // Fetch categories

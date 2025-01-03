@@ -2,6 +2,7 @@ import React, { useState, useEffect, createContext } from 'react';
 import { Container, Typography, Button, Box, List, ListItem, ListItemText } from '@mui/material';
 import axios from 'axios';
 import { useNavigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const ExamContext = createContext();
 
@@ -9,8 +10,14 @@ const HomePageStudent = () => {
 
   const [exam, setExam] = useState(null);
   const [examStarted, setExamStarted] = useState(false);
-  // const [examAttempted, setExamAttempted] = useState(false);
   const navigate = useNavigate();
+  const { authenticated } = useAuth();
+
+  useEffect(() => {
+    if (!authenticated) {
+      navigate('/');
+    }
+  }, [authenticated, navigate]);
 
   useEffect(() => {
     const fetchActiveExam = async () => {
@@ -54,7 +61,7 @@ const HomePageStudent = () => {
                   <ListItemText primary="Read all the questions carefully. Answer all the questions to the best of your ability." />
                 </ListItem>
                 <ListItem>
-                  <ListItemText primary={`You have ${exam?.duration} minutes to complete the exam.`} />
+                  <ListItemText primary={`You have ${exam?.duration} minutes to complete the exam. Exam will be auto-submitted after ${exam?.duration} minutes.`} />
                 </ListItem>
                 <ListItem>
                   <ListItemText primary="Once you start the exam, you cannot pause it or change tabs or window." />

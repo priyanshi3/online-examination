@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { AppBar, Toolbar, Typography, List, ListItem, ListItemText, Container, Box } from '@mui/material';
+import { Toolbar, Typography, List, ListItem, ListItemText, Container, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ManageStudents from './ManageStudents';
 import ManageQuestions from './ManageQuestions';
@@ -10,6 +10,12 @@ const HomePageAdmin = () => {
   const { authenticated, user } = useAuth();
   const navigate = useNavigate();
   const [selectedItem, setSelectedItem] = useState('welcome');
+
+  useEffect(() => {
+    if (!authenticated) {
+      navigate('/');
+    }
+  }, [authenticated, navigate]);
 
   const handleMenuItemClick = (path, item) => {
     navigate('.' + path);
@@ -50,13 +56,16 @@ const HomePageAdmin = () => {
               Welcome
             </Typography>
           </ListItem>
-          <ListItem button onClick={() => handleMenuItemClick('/students', 'students')}>
+          <ListItem button onClick={() => handleMenuItemClick('/students', 'students')}
+            sx={{ cursor: 'pointer', backgroundColor: selectedItem === 'students' ? 'lightgray' : 'transparent', '&:hover': { backgroundColor: 'lightgray' } }}>
             <ListItemText primary="Students" sx={{ color: 'black' }} />
           </ListItem>
-          <ListItem button onClick={() => handleMenuItemClick('/questions', 'questions')}>
+          <ListItem button onClick={() => handleMenuItemClick('/questions', 'questions')}
+            sx={{ cursor: 'pointer', backgroundColor: selectedItem === 'questions' ? 'lightgray' : 'transparent', '&:hover': { backgroundColor: 'lightgray' } }}>
             <ListItemText primary="Questions" sx={{ color: 'black' }} />
           </ListItem>
-          <ListItem button onClick={() => handleMenuItemClick('/exams', 'exams')}>
+          <ListItem button onClick={() => handleMenuItemClick('/exams', 'exams')}
+            sx={{ cursor: 'pointer', backgroundColor: selectedItem === 'exams' ? 'lightgray' : 'transparent', '&:hover': { backgroundColor: 'lightgray' } }}>
             <ListItemText primary="Exams" sx={{ color: 'black' }} />
           </ListItem>
         </List>
