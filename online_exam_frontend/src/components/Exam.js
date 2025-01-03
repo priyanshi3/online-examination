@@ -308,7 +308,7 @@ const Exam = () => {
                     flexGrow: 1, padding: 2, minWidth: '100vh', justifyContent: 'center', marginTop: 5
                 }}>
                     <Toolbar />
-                    {/* <MyTimer expiryTimestamp={time} onPause={setPauseFunction} handleSubmitExam={handleSubmitExam} /> */}
+                    <MyTimer expiryTimestamp={time} onPause={setPauseFunction} handleSubmitExam={handleSubmitExam} />
                     <Container sx={{ textAlign: 'left' }} >
 
                         <Typography variant="h5">{questions[currentQuestionIndex].question}</Typography>
@@ -344,22 +344,6 @@ const Exam = () => {
                                     />
                                 </Box>
                             </>
-                            // <TextField
-                            //     multiline
-                            //     rows={15}
-                            //     variant="outlined"
-                            //     fullWidth
-                            //     value={answers[currentQuestionIndex]?.optionId || ''}
-                            //     onChange={handleAnswerChange}
-                            //     placeholder="Your answer here..."
-                            //     sx={{
-                            //         width: '100%',
-                            //         backgroundColor: 'white',
-                            //         fontFamily: 'monospace',
-                            //         fontSize: '16px',
-                            //         padding: 2
-                            //     }}
-                            // />
                         ) : (
                             <FormControl component="fieldset" sx={{ marginTop: '20px' }}>
                                 <RadioGroup
