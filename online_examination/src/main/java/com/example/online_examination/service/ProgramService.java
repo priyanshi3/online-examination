@@ -16,4 +16,10 @@ public class ProgramService {
 		return programRepository.save(program);
 	}
 
+	public Program fetchByQuestionId(Long questionId) {
+		Program program = programRepository.findByQuestionId_QuestionId(questionId)
+				.orElseThrow(() -> new RuntimeException("Program Solution not found for this question"));
+		return program;
+	}
+
 }

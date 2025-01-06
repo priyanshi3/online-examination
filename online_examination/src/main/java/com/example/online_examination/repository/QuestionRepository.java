@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import com.example.online_examination.entity.Category;
 import com.example.online_examination.entity.Question;
 
 @Repository
@@ -19,5 +20,8 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 	@Query("SELECT q FROM Question q WHERE q.categoryId.categoryId = :categoryId "
 			+ "AND (:difficultyLevelId IS NULL OR q.difficultyLevelId.difficultyLevelId = :difficultyLevelId)")
 	List<Question> findByCategoryAndDifficulty(Integer categoryId, Integer difficultyLevelId);
+
+	// Check if question already exists
+	boolean existsByQuestionAndCategoryId(String question, Category category);
 
 }

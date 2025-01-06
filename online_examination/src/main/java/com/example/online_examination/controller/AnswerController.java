@@ -1,15 +1,19 @@
 package com.example.online_examination.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.online_examination.entity.Answer;
 import com.example.online_examination.entity.AnswerDTO;
@@ -106,6 +110,20 @@ public class AnswerController {
 		result.setTotalScore(scores.get("countLogical") + scores.get("countTechnical"));
 		resultRepository.save(result);
 		return "success";
+	}
+
+	@PostMapping("/import")
+	public ResponseEntity<String> importQuestions(@RequestParam("file") MultipartFile file) {
+		try {
+			answerService.importQuestions(file);
+			return ResponseEntity.ok("File imported successfully");
+		} catch (IOException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error reading Excel file: " + e.getMessage());
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error: " + e.getMessage());
+		}
 	}
 
 }

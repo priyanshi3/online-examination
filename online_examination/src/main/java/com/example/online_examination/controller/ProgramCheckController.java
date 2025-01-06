@@ -23,8 +23,6 @@ public class ProgramCheckController {
 	// fetch to set marks
 	@GetMapping("/fetchAll")
 	public List<ProgramCheck> fecthAllToCheck() {
-		System.out.println("------------------------------------");
-		System.out.println(programCheckService.fecthAllToCheck());
 		return programCheckService.fecthAllToCheck();
 	}
 

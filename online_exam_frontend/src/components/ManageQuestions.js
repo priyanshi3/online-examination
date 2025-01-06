@@ -17,6 +17,8 @@ import {
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { styled } from '@mui/material/styles';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 const ManageQuestions = () => {
   const { authenticated } = useAuth();
@@ -35,6 +37,7 @@ const ManageQuestions = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [file, setFile] = useState(null);
 
   useEffect(() => {
     if (!authenticated) {
@@ -114,7 +117,6 @@ const ManageQuestions = () => {
 
     try {
       const response = await axios.post('http://localhost:8080/question/addQuestion', questionData);
-      console.log('Question submitted successfully:', response.data);
 
       // add options value to database
       const newQuestionId = parseInt(response.data.questionId, 10);
@@ -192,12 +194,98 @@ const ManageQuestions = () => {
     setSnackbarOpen(false);
   };
 
+  // import excel file
+  const handleFileChange = (event) => {
+    setFile(event.target.files[0]);
+  };
+
+  const handleImport = async () => {
+
+    if (!file) {
+      setSnackbarMessage('Please select a file to upload.');
+      setSnackbarSeverity('warning');
+      setSnackbarOpen(true);
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      await axios.post('http://localhost:8080/answer/import', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setSnackbarMessage('File imported successfully.');
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
+      // setFile(null);
+    } catch (error) {
+      setSnackbarMessage('Error importing file: ' + error.message);
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    }
+  };
+
+  // for MUI upload button
+  const VisuallyHiddenInput = styled('input')({
+    clip: 'rect(0 0 0 0)',
+    clipPath: 'inset(50%)',
+    height: 1,
+    overflow: 'hidden',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    whiteSpace: 'nowrap',
+    width: 1,
+  });
+
   return (
     <Box sx={{ padding: 3, marginLeft: 4 }}>
       <Typography variant="h4" gutterBottom>
         Manage Questions
       </Typography>
 
+      {/* Import Section */}
+      <Grid container spacing={2} sx={{ marginBottom: 4 }}>
+        <Grid item xs={12} sm={6}>
+          <Typography variant="h6">Import Students from Excel</Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, marginTop: 2 }}>
+            <Button
+              component="label"
+              role={undefined}
+              variant="outlined"
+              tabIndex={-1}
+              startIcon={<CloudUploadIcon />}
+              sx={{
+                '&:hover': {
+                  backgroundColor: 'primary.main',
+                  color: 'white',
+                },
+              }}
+            >
+              Upload file
+              <input
+                type="file"
+                onChange={handleFileChange}
+                accept=".xlsx, .xls"
+                hidden
+              />
+            </Button>
+            <Typography variant="body2" sx={{ fontStyle: 'italic', fontSize: 17, flexGrow: 1 }}>
+              {file?.name || 'No file selected'}
+            </Typography>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleImport}
+            >
+              Import
+            </Button>
+          </Box>
+        </Grid>
+      </Grid>
+
+      {/* Form to add questions */}
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Typography variant="h6">Add New Question</Typography>
@@ -262,7 +350,7 @@ const ManageQuestions = () => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Programming Details"
+                label="Programm Answer"
                 name="programmingDetails"
                 value={newQuestion.programmingDetails}
                 onChange={handleInputChange}

@@ -35,6 +35,7 @@ const ManageStudents = () => {
   const [students, setStudents] = useState([]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [isEditing, setIsEditing] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
   const [file, setFile] = useState(null);
@@ -52,6 +53,7 @@ const ManageStudents = () => {
       setStudents(response.data);
     } catch (error) {
       setSnackbarMessage('Error fetching students: ' + error.message);
+      setSnackbarSeverity('error');
       setSnackbarOpen(true);
     }
   };
@@ -68,6 +70,7 @@ const ManageStudents = () => {
   const handleAddStudent = async () => {
     if (Object.values(newStudent).some((field) => field === '')) {
       setSnackbarMessage('Please fill in all fields.');
+      setSnackbarSeverity('warning');
       setSnackbarOpen(true);
       return;
     }
@@ -79,6 +82,7 @@ const ManageStudents = () => {
       resetForm();
     } catch (error) {
       setSnackbarMessage('Error adding student: ' + error.message);
+      setSnackbarSeverity('error');
       setSnackbarOpen(true);
     }
   };
@@ -87,6 +91,7 @@ const ManageStudents = () => {
     // update details
     if (Object.values(newStudent).some((field) => field === '')) {
       setSnackbarMessage('Please fill in all fields.');
+      setSnackbarSeverity('warning');
       setSnackbarOpen(true);
       return;
     }
@@ -102,6 +107,7 @@ const ManageStudents = () => {
       resetForm();
     } catch (error) {
       setSnackbarMessage('Error updating student: ' + error.message);
+      setSnackbarSeverity('error');
       setSnackbarOpen(true);
     }
   };
@@ -114,6 +120,7 @@ const ManageStudents = () => {
     setIsEditing(true);
 
   };
+
   // import excel file
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
@@ -122,6 +129,7 @@ const ManageStudents = () => {
   const handleImport = async () => {
     if (!file) {
       setSnackbarMessage('Please select a file to upload.');
+      setSnackbarSeverity('warning');
       setSnackbarOpen(true);
       return;
     }
@@ -134,11 +142,13 @@ const ManageStudents = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setSnackbarMessage('File imported successfully.');
+      setSnackbarSeverity('success');
       setSnackbarOpen(true);
       fetchStudents();
       setFile(null);
     } catch (error) {
       setSnackbarMessage('Error importing file: ' + error.message);
+      setSnackbarSeverity('error');
       setSnackbarOpen(true);
     }
   };
@@ -301,7 +311,7 @@ const ManageStudents = () => {
 
       {/* Snackbar for notifications */}
       <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-        <Alert onClose={handleCloseSnackbar} severity="warning" sx={{ width: '100%' }}>
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
           {snackbarMessage}
         </Alert>
       </Snackbar>

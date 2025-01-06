@@ -13,4 +13,7 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 	@Query("SELECT s FROM Student s WHERE s.emailId = :emailId ")
 	Student existsByEmailId(String emailId);
 
+	// CHeck for duplicate student data
+	boolean existsByEmailIdOrPhoneNumber(String emailId, Long phoneNumber);
+
 }

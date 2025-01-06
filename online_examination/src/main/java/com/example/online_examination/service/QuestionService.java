@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.online_examination.entity.Answer;
+import com.example.online_examination.entity.Category;
 import com.example.online_examination.entity.Options;
 import com.example.online_examination.entity.Question;
 import com.example.online_examination.repository.AnswerRepository;
@@ -43,6 +44,10 @@ public class QuestionService {
 
 	public List<Question> findByCategoryAndDifficulty(Integer categoryId, Integer difficultyLevelId) {
 		return questionRepository.findByCategoryAndDifficulty(categoryId, difficultyLevelId);
+	}
+
+	public boolean existsByQuestionAndCategory(String question, Category category) {
+		return questionRepository.existsByQuestionAndCategoryId(question, category);
 	}
 
 }

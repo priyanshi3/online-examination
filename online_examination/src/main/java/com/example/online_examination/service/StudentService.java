@@ -144,6 +144,15 @@ public class StudentService {
 					&& !student.getLastName().isEmpty() && student.getEmailId() != null
 					&& !student.getEmailId().isEmpty() && student.getPhoneNumber() != null
 					&& student.getPhoneNumber() > 0 && student.getCpi() != null && student.getCpi() >= 0.0) {
+
+				// Check for duplicate student data
+				boolean studentExists = studentRepository.existsByEmailIdOrPhoneNumber(student.getEmailId(),
+						student.getPhoneNumber());
+				if (studentExists) {
+					System.out.println("Student data already exists: " + student.getEmailId());
+					continue;
+				}
+
 				students.add(student);
 			}
 		}

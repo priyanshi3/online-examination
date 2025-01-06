@@ -119,11 +119,24 @@ const ManageExam = () => {
     const fetchProgramCodes = async () => {
         try {
             const response = await axios.get('http://localhost:8080/programCheck/fetchAll');
-            setProgramCodes(response.data);
+            const programCodesWithSolutions = await Promise.all(
+                response.data.map(async (program) => {
+                    try {
+                        const responseSolution = await axios.get(
+                            `http://localhost:8080/program/fetchByQuestion?questionId=${parseInt(program.question.questionId)}`
+                        );
+                        return { ...program, programSolution: responseSolution.data };
+                    } catch (error) {
+                        console.error(`Error fetching program solution for questionId ${program.question.questionId}:`, error);
+                        return { ...program, programSolution: null };
+                    }
+                })
+            );
+            setProgramCodes(programCodesWithSolutions);
         } catch (error) {
             console.error("Error fetching program codes to assess:", error);
         }
-    }
+    };
 
     // fetch all results for active exam
     const fetchResults = async () => {
@@ -141,6 +154,7 @@ const ManageExam = () => {
         fetchDifficulties();
         fetchExams();
         fetchProgramCodes();
+
     }, []);
 
     useEffect(() => {
@@ -216,6 +230,7 @@ const ManageExam = () => {
 
                 try {
                     await axios.post('http://localhost:8080/examQuestion/addExamQuestion', examQuestionData);
+                    fetchExams();
                 } catch (error) {
                     console.error(`Error adding question ${questionId} to exam:`, error);
                     setSnackbarMessage('Error adding some questions to the exam. Please try again.');
@@ -531,25 +546,45 @@ const ManageExam = () => {
                                         key={program.programCheckId}
                                         sx={{
                                             display: 'flex',
+                                            flexDirection: 'row',
+                                            alignItems: 'center',
                                             padding: 1,
                                             borderRadius: 1,
                                             backgroundColor: '#ffffff',
                                             boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)',
-                                            gap: 3
+                                            gap: 2
                                         }}
                                     >
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        {/* Question ID */}
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1 }}>
                                             <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
                                                 Question ID:
                                             </Typography>
                                             <Typography variant="body2">{program.question.questionId}</Typography>
                                         </Box>
+
+                                        {/* Question */}
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1 }}>
-                                            <Typography variant="body2" sx={{ fontWeight: 'bold', marginLeft: 2 }}>
+                                            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
                                                 Question:
                                             </Typography>
                                             <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
                                                 {program.question.question}
+                                            </Typography>
+                                        </Box>
+
+                                        {/* Program Answer */}
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 3 }}>
+                                            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                                                Program Answer:
+                                            </Typography>
+                                            <Typography variant="body2" sx={{
+                                                fontStyle: 'italic',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap'
+                                            }}>
+                                                {program.programSolution.programSolution}
                                             </Typography>
                                         </Box>
                                     </Box>
@@ -673,11 +708,11 @@ const ManageExam = () => {
                     </Table>
                 </TableContainer>
 
-                {/* <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
+                <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
                     <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
                         {snackbarMessage}
                     </Alert>
-                </Snackbar> */}
+                </Snackbar>
             </TabPanel>
         </Box>
     );
