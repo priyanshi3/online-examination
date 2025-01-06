@@ -17,11 +17,11 @@ const LoginPage = () => {
     event.preventDefault();
     setError(''); // Reset error message
     // Check if user is admin
-    if (emailId === "admin@roimaint.com") {
+    if (emailId === "admin@gmail.com") {
       if (!showPasswordField) {
         setShowPasswordField(true);
         return;
-      } else if (password !== "RoimaIntelligencePassword") {
+      } else if (password !== "AdminPassword") {
         setError("Invalid password for admin.");
         return;
       } else {
