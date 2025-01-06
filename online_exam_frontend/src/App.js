@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import AppBar from './components/MenuAppBar';
 import LoginPage from './components/LoginPage';
+import ManagEmployee from './components/ManageEmployee';
 import HomePageAdmin from './components/HomePageAdmin';
 import ManageStudents from './components/ManageStudents';
 import ManageQuestions from './components/ManageQuestions';
@@ -19,6 +20,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<LoginPage />} />
 
+          <Route path="/admin" element={<ManagEmployee />} />
           <Route path="/home" element={<HomePageAdmin />}>   // home page for employee after login
             <Route path="students" element={<ManageStudents />} />   // page to manage students by employee
             <Route path="questions" element={<ManageQuestions />} />  // page to manage questions by employee
@@ -30,8 +32,8 @@ const App = () => {
             <Route path="thankYou" element={<ThankYouPage />} />   // after submitting exam
           </Route>
         </Routes>
-      </Router>
-    </AuthProvider>
+      </Router >
+    </AuthProvider >
   );
 };
 

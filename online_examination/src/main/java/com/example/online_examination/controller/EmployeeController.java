@@ -16,6 +16,11 @@ public class EmployeeController {
 	@Autowired
 	private EmployeeService employeeService;
 
+	@PostMapping("/addEmployee")
+	public Employee addEmployee(@RequestBody Employee employee) {
+		return employeeService.addEmployee(employee);
+	}
+
 	// check for valid employee for login
 	@PostMapping("/login")
 	public Employee studentExist(@RequestBody Employee employee) {

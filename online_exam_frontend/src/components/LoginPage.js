@@ -10,10 +10,27 @@ const LoginPage = () => {
 
   const [emailId, setEmailID] = useState('');
   const [error, setError] = useState('');
+  const [password, setPassword] = useState('');   // For admin
+  const [showPasswordField, setShowPasswordField] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError(''); // Reset error message
+    // Check if user is admin
+    if (emailId === "admin@roimaint.com") {
+      if (!showPasswordField) {
+        setShowPasswordField(true);
+        return;
+      } else if (password !== "RoimaIntelligencePassword") {
+        setError("Invalid password for admin.");
+        return;
+      } else {
+        setAuthenticated(true);
+        setUser(emailId);
+        navigate('/admin');
+        return;
+      }
+    }
 
     try {
       const responseStudent = await axios.post('http://localhost:8080/student/login', {
@@ -31,8 +48,7 @@ const LoginPage = () => {
           setAuthenticated(true);
           setUser(responseEmployee.data);
           navigate('/home');
-        }
-        else {
+        } else {
           setAuthenticated(false);
           setError("Invalid email");
         }
@@ -70,8 +86,23 @@ const LoginPage = () => {
             helperText={error}
             sx={{ backgroundColor: 'white' }}
           />
+          {showPasswordField && (
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              variant="outlined"
+              error={!!error}
+              helperText={error}
+              sx={{ backgroundColor: 'white' }}
+            />
+          )}
           <Button type="submit" fullWidth variant="contained" color="primary" sx={{ mt: 3, mb: 2 }}>
-            Login
+            {showPasswordField ? "Login as Admin" : "Login"}
           </Button>
         </Box>
       </Paper>
